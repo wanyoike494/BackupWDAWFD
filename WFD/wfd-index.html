@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>World Finance Dashboard – Global Markets, Crypto & Financial Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ─── CSS Variables ─────────────────────────────────── */
+    :root {
+      --green-deep:   #1a3c2e;
+      --green-mid:    #2d6a4f;
+      --green-light:  #52b788;
+      --green-pale:   #b7e4c7;
+      --blue-deep:    #0a2744;
+      --blue-mid:     #1565c0;
+      --blue-sky:     #4a9fd4;
+      --blue-pale:    #bbdefb;
+      --brown-deep:   #3e2723;
+      --brown-mid:    #795548;
+      --brown-light:  #a1887f;
+      --brown-pale:   #d7ccc8;
+      --gold:         #c9a84c;
+      --gold-light:   #f0d080;
+      --gold-pale:    #fdf3d0;
+      --red-neg:      #c62828;
+      --red-pale:     #fce4ec;
+      --green-pos:    #2e7d32;
+      --green-pos-pale:#e8f5e9;
+      --cream:        #f9f6f0;
+      --warm-white:   #fefcf8;
+      --text-dark:    #1a1a1a;
+      --text-mid:     #4a4a4a;
+      --text-light:   #7a7a7a;
+      --card-bg:      #ffffff;
+      --border:       #e8e2d8;
+      --shadow-sm: 0 2px 12px rgba(26,60,46,0.08);
+      --shadow-md: 0 8px 32px rgba(26,60,46,0.12);
+      --shadow-lg: 0 20px 60px rgba(26,60,46,0.16);
+      --ticker-h: 40px;
+    }
+
+    /* ─── Reset & Base ──────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--text-dark);
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { display: block; max-width: 100%; }
+
+    /* ─── Grain Overlay ─────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 9999; opacity: 0.6;
+    }
+
+    /* ─── LIVE TICKER ───────────────────────────────────── */
+    .ticker-bar {
+      background: var(--blue-deep);
+      height: var(--ticker-h);
+      display: flex; align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .ticker-label {
+      flex-shrink: 0;
+      background: var(--gold);
+      color: var(--blue-deep);
+      font-family: 'DM Mono', monospace;
+      font-size: .7rem; font-weight: 500;
+      padding: 0 14px; height: 100%;
+      display: flex; align-items: center;
+      letter-spacing: .08em;
+      z-index: 2;
+    }
+    .ticker-track {
+      overflow: hidden;
+      flex: 1;
+      height: 100%;
+      position: relative;
+    }
+    .ticker-inner {
+      display: flex; align-items: center;
+      gap: 0; height: 100%;
+      animation: tickerScroll 38s linear infinite;
+      white-space: nowrap;
+    }
+    .ticker-inner:hover { animation-play-state: paused; }
+    @keyframes tickerScroll {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .tick-item {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 0 20px;
+      font-family: 'DM Mono', monospace;
+      font-size: .72rem; color: rgba(255,255,255,.85);
+      border-right: 1px solid rgba(255,255,255,.1);
+      height: 100%;
+    }
+    .tick-name { color: rgba(255,255,255,.55); font-size: .65rem; }
+    .tick-val { color: #fff; font-weight: 500; }
+    .tick-chg { font-size: .67rem; }
+    .tick-chg.up   { color: #69f0ae; }
+    .tick-chg.down { color: #ff5252; }
+
+    /* ─── NAV ───────────────────────────────────────────── */
+    nav {
+      position: sticky; top: 0; z-index: 200;
+      background: rgba(249,246,240,0.93);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 clamp(1rem, 4vw, 3rem);
+    }
+    .nav-inner {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      height: 64px; max-width: 1380px; margin: 0 auto;
+    }
+    .logo {
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem; font-weight: 700;
+      color: var(--blue-deep);
+      transition: opacity .2s;
+      flex-shrink: 0;
+    }
+    .logo:hover { opacity: .75; }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--blue-mid), var(--gold));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .logo-text { display: flex; flex-direction: column; line-height: 1.1; }
+    .logo-text .l1 { font-size: 1rem; }
+    .logo-text .l2 { font-size: .65rem; font-weight: 400; font-family: 'DM Mono', monospace; color: var(--text-light); letter-spacing: .05em; }
+
+    .nav-links {
+      display: flex; align-items: center; gap: 2px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: .84rem; font-weight: 500;
+      color: var(--text-mid);
+      padding: 6px 12px; border-radius: 6px;
+      transition: all .2s; white-space: nowrap;
+    }
+    .nav-links a:hover { color: var(--blue-deep); background: var(--blue-pale); }
+    .nav-links a.active { color: var(--blue-mid); font-weight: 600; }
+
+    .nav-right {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .btn-ghost {
+      padding: 7px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: .84rem; font-weight: 500;
+      color: var(--text-mid);
+      transition: all .2s;
+      cursor: pointer; background: transparent;
+    }
+    .btn-ghost:hover { border-color: var(--blue-mid); color: var(--blue-mid); }
+    .btn-primary {
+      padding: 8px 20px;
+      background: var(--blue-deep);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: .84rem; font-weight: 600;
+      transition: all .25s;
+      cursor: pointer;
+    }
+    .btn-primary:hover {
+      background: var(--blue-mid);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(21,101,192,.35);
+    }
+
+    /* ─── CATEGORY BAR ──────────────────────────────────── */
+    .cat-bar {
+      background: var(--warm-white);
+      border-bottom: 1px solid var(--border);
+      padding: 0 clamp(1rem, 4vw, 3rem);
+    }
+    .cat-bar-inner {
+      display: flex; align-items: center;
+      max-width: 1380px; margin: 0 auto;
+      height: 48px; gap: 0; overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .cat-bar-inner::-webkit-scrollbar { display: none; }
+    .cat-item {
+      display: flex; align-items: center; gap: 6px;
+      font-size: .81rem; font-weight: 500;
+      color: var(--text-mid); white-space: nowrap;
+      padding: 4px 14px; border-radius: 6px;
+      cursor: pointer; transition: all .2s;
+    }
+    .cat-item:hover { color: var(--blue-deep); background: var(--blue-pale); }
+    .cat-item.active { color: var(--blue-mid); font-weight: 600; background: var(--blue-pale); }
+    .cat-sep { color: var(--border); padding: 0 2px; font-size: .9rem; }
+
+    /* ─── ANIMATIONS ────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes drift1 { to { transform: translate(60px, 40px); } }
+    @keyframes drift2 { to { transform: translate(-40px, -30px); } }
+    @keyframes pulse  { 0%,100%{opacity:.6} 50%{opacity:1} }
+    @keyframes wobble {
+      0%,100% { border-radius: 50% 40% 60% 30%/40% 50% 60% 50%; transform: scale(1); }
+      50% { border-radius: 30% 60% 40% 70%/60% 40% 50% 40%; transform: scale(1.04); }
+    }
+    @keyframes lineGrow {
+      from { stroke-dashoffset: 600; }
+      to   { stroke-dashoffset: 0; }
+    }
+    @keyframes countUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+    .reveal {
+      opacity: 0; transform: translateY(28px);
+      transition: opacity .65s ease, transform .65s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ─── HERO ──────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      background: linear-gradient(180deg, var(--warm-white) 0%, var(--cream) 100%);
+      padding: clamp(2rem, 4vw, 3.5rem) clamp(1rem, 3vw, 2rem);
+      overflow: hidden;
+    }
+    .hero::before, .hero::after {
+      content: ''; position: absolute; border-radius: 50%;
+      filter: blur(90px); opacity: .12; pointer-events: none;
+    }
+    .hero::before {
+      width: 520px; height: 520px;
+      background: radial-gradient(circle, var(--blue-sky), transparent);
+      top: -160px; left: -100px;
+      animation: drift1 13s ease-in-out infinite alternate;
+    }
+    .hero::after {
+      width: 420px; height: 420px;
+      background: radial-gradient(circle, var(--gold-light), transparent);
+      bottom: -100px; right: -80px;
+      animation: drift2 15s ease-in-out infinite alternate;
+    }
+
+    .hero-inner {
+      position: relative; max-width: 1380px; margin: 0 auto;
+      display: grid;
+      grid-template-columns: 300px 1fr 300px;
+      gap: 24px; align-items: start;
+    }
+    .hero-center { text-align: center; }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4.5vw, 3.5rem);
+      font-weight: 900; line-height: 1.1;
+      color: var(--blue-deep); margin-bottom: .75rem;
+      opacity: 0; transform: translateY(24px);
+      animation: fadeUp .7s ease forwards .1s;
+    }
+    .hero h1 .accent { color: var(--gold); }
+    .hero h1 .accent-blue { color: var(--blue-mid); }
+    .hero-sub {
+      font-size: clamp(.88rem, 1.6vw, 1.05rem);
+      color: var(--text-mid); font-weight: 300;
+      margin-bottom: 2rem; max-width: 540px; margin-left: auto; margin-right: auto;
+      opacity: 0; transform: translateY(20px);
+      animation: fadeUp .7s ease forwards .25s;
+    }
+
+    /* Search */
+    .search-wrap {
+      position: relative; max-width: 520px; margin: 0 auto 1.8rem;
+      opacity: 0; transform: translateY(16px);
+      animation: fadeUp .7s ease forwards .38s;
+    }
+    .search-wrap input {
+      width: 100%; padding: 13px 18px 13px 46px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px; background: var(--card-bg);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9rem; color: var(--text-dark);
+      box-shadow: var(--shadow-sm);
+      transition: all .25s; outline: none;
+    }
+    .search-wrap input:focus {
+      border-color: var(--blue-sky);
+      box-shadow: 0 0 0 4px rgba(74,159,212,.15), var(--shadow-md);
+    }
+    .search-icon {
+      position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+      color: var(--text-light); pointer-events: none;
+    }
+    .search-wrap input::placeholder { color: var(--text-light); }
+
+    /* Stats bar */
+    .stats-bar {
+      display: flex; justify-content: center; gap: 2px;
+      max-width: 600px; margin: 0 auto;
+      border: 1px solid var(--border); border-radius: 12px;
+      overflow: hidden; background: var(--card-bg);
+      box-shadow: var(--shadow-sm);
+      opacity: 0; transform: translateY(12px);
+      animation: fadeUp .7s ease forwards .5s;
+    }
+    .stat {
+      flex: 1; padding: 13px 8px; text-align: center;
+      border-right: 1px solid var(--border);
+      cursor: default; transition: all .25s;
+    }
+    .stat:last-child { border-right: none; }
+    .stat:hover { background: var(--blue-pale); }
+    .stat-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.25rem; font-weight: 500; color: var(--blue-deep);
+    }
+    .stat-label { font-size: .72rem; color: var(--text-light); margin-top: 2px; }
+
+    /* ─── SIDE PANELS ───────────────────────────────────── */
+    .hero-side { display: flex; flex-direction: column; gap: 14px; }
+
+    /* Market card */
+    .hw-market {
+      background: var(--card-bg);
+      border: 1px solid var(--border); border-radius: 16px;
+      padding: 16px 18px; box-shadow: var(--shadow-sm);
+      transition: all .3s; cursor: default; position: relative; overflow: hidden;
+    }
+    .hw-market:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .hw-market::after {
+      content: ''; position: absolute; top: 0; left: 0;
+      width: 4px; height: 100%; border-radius: 16px 0 0 16px;
+    }
+    .hw-market.blue::after  { background: linear-gradient(180deg, var(--blue-sky), var(--blue-mid)); }
+    .hw-market.gold::after  { background: linear-gradient(180deg, var(--gold-light), var(--gold)); }
+    .hw-market.green::after { background: linear-gradient(180deg, var(--green-light), var(--green-mid)); }
+    .hw-market.red::after   { background: linear-gradient(180deg, #ff8a80, var(--red-neg)); }
+
+    .mkt-label {
+      font-size: .7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .07em; color: var(--text-light); margin-bottom: 3px;
+    }
+    .mkt-val {
+      font-family: 'DM Mono', monospace; font-size: 1.4rem; font-weight: 500;
+      color: var(--blue-deep); line-height: 1;
+    }
+    .mkt-chg {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: .7rem; font-weight: 600;
+      padding: 2px 7px; border-radius: 20px; margin-top: 5px;
+    }
+    .mkt-chg.up   { background: var(--green-pos-pale); color: var(--green-pos); }
+    .mkt-chg.down { background: var(--red-pale); color: var(--red-neg); }
+    .mkt-sub { font-size: .7rem; color: var(--text-light); margin-top: 2px; }
+
+    /* Dark gradient card (sparkline style) */
+    .hw-wave {
+      background: linear-gradient(135deg, var(--blue-deep), #0d3a6e);
+      border-radius: 16px; padding: 16px 18px; transition: all .3s; cursor: default;
+    }
+    .hw-wave:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .hw-wave-label {
+      font-size: .68rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .07em; color: rgba(255,255,255,.45); margin-bottom: 3px;
+    }
+    .hw-wave-val {
+      font-family: 'DM Mono', monospace; font-size: 1.35rem;
+      color: #fff; line-height: 1; margin-bottom: 8px;
+    }
+    .hw-wave-sub { font-size: .66rem; color: rgba(255,255,255,.4); margin-top: 5px; }
+    .hw-wave-chg { font-size: .72rem; font-weight: 600; color: #69f0ae; }
+
+    /* Gold accent card */
+    .hw-gold {
+      background: linear-gradient(135deg, var(--gold-pale), #fffde7);
+      border: 1px solid rgba(201,168,76,.3); border-radius: 16px;
+      padding: 16px 18px; box-shadow: var(--shadow-sm); transition: all .3s;
+    }
+    .hw-gold:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .hw-gold-label {
+      font-size: .7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .07em; color: var(--gold); margin-bottom: 3px;
+    }
+    .hw-gold-val {
+      font-family: 'DM Mono', monospace; font-size: 1.35rem;
+      font-weight: 500; color: var(--brown-deep); line-height: 1;
+    }
+
+    /* Mini bar chart */
+    .hw-bars {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 14px; padding: 14px 16px;
+      box-shadow: var(--shadow-sm); transition: all .3s;
+    }
+    .hw-bars:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .hw-bars-title { font-size: .78rem; font-weight: 600; color: var(--text-mid); margin-bottom: 10px; }
+    .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .bar-row:last-child { margin-bottom: 0; }
+    .bar-name { font-size: .66rem; color: var(--text-light); width: 34px; flex-shrink: 0; }
+    .bar-track { flex: 1; height: 7px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; transition: width 1.4s cubic-bezier(.25,.8,.25,1); width: 0%; }
+    .bar-pct { font-size: .64rem; font-family: 'DM Mono', monospace; color: var(--text-light); width: 30px; text-align: right; flex-shrink: 0; }
+
+    /* Crypto mini card */
+    .hw-crypto {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 14px; padding: 14px 16px;
+      box-shadow: var(--shadow-sm); transition: all .3s;
+    }
+    .hw-crypto:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .hw-crypto-title { font-size: .78rem; font-weight: 600; color: var(--text-mid); margin-bottom: 10px; }
+    .crypto-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 5px 0; border-bottom: 1px solid #f4f1ec;
+      font-size: .74rem; cursor: pointer; transition: all .2s;
+    }
+    .crypto-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .crypto-row:hover { padding-left: 4px; }
+    .crypto-sym { font-family: 'DM Mono', monospace; font-weight: 500; color: var(--blue-deep); }
+    .crypto-name { color: var(--text-light); font-size: .65rem; }
+    .crypto-price { font-family: 'DM Mono', monospace; font-size: .73rem; color: var(--text-dark); }
+    .crypto-chg { font-size: .68rem; font-weight: 600; padding: 1px 5px; border-radius: 8px; }
+    .crypto-chg.up   { background: var(--green-pos-pale); color: var(--green-pos); }
+    .crypto-chg.down { background: var(--red-pale); color: var(--red-neg); }
+
+    /* ─── MOBILE NAV TOGGLE ─────────────────────────────── */
+    .hamburger {
+      display: none; flex-direction: column; gap: 5px; cursor: pointer;
+      padding: 6px; border-radius: 6px; transition: background .2s;
+    }
+    .hamburger:hover { background: var(--blue-pale); }
+    .hamburger span {
+      display: block; width: 22px; height: 2px;
+      background: var(--blue-deep); border-radius: 2px;
+      transition: all .3s;
+    }
+    .mobile-menu {
+      display: none; position: fixed; inset: 0; top: 64px;
+      background: var(--warm-white); z-index: 199;
+      padding: 1.5rem; overflow-y: auto;
+    }
+    .mobile-menu.open { display: block; }
+    .mobile-menu ul { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+    .mobile-menu ul a {
+      display: block; padding: 12px 16px;
+      font-size: .95rem; font-weight: 500; color: var(--text-dark);
+      border-radius: 8px; transition: all .2s;
+    }
+    .mobile-menu ul a:hover { background: var(--blue-pale); color: var(--blue-mid); }
+    .mobile-menu-divider { height: 1px; background: var(--border); margin: 12px 0; }
+    .mobile-menu .btn-primary { width: 100%; text-align: center; display: block; padding: 13px; font-size: .95rem; border-radius: 10px; }
+
+    /* ─── RESPONSIVE hero collapse ─────────────────────── */
+    @media (max-width: 1100px) {
+      .hero-inner { grid-template-columns: 1fr; text-align: center; }
+      .hero-side { display: none; }
+      .hero-side.left-side  { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+      .hero-side.right-side { display: none; }
+    }
+    @media (max-width: 760px) {
+      .hero-side.left-side { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 900px) {
+      .nav-links { display: none; }
+      .nav-right .btn-ghost { display: none; }
+      .hamburger { display: flex; }
+    }
+
+    /* ─── SECTION COMMON ────────────────────────────────── */
+    .section {
+      padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 4vw, 3rem);
+      max-width: 1380px; margin: 0 auto;
+    }
+    .section-header {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-bottom: 1.5rem; gap: 1rem; flex-wrap: wrap;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.4rem, 2.5vw, 1.8rem); font-weight: 700;
+      color: var(--blue-deep);
+    }
+    .section-title span { color: var(--gold); }
+    .section-sub { font-size: .85rem; color: var(--text-light); margin-top: 3px; }
+    .view-all {
+      font-size: .82rem; font-weight: 600; color: var(--blue-mid);
+      display: flex; align-items: center; gap: 4px; white-space: nowrap;
+      transition: gap .2s;
+    }
+    .view-all:hover { gap: 7px; }
+
+    /* ─── CHART CARD ────────────────────────────────────── */
+    .chart-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 16px; padding: 22px; box-shadow: var(--shadow-sm);
+      transition: all .3s cubic-bezier(.25,.8,.25,1);
+      position: relative; overflow: hidden; cursor: pointer;
+    }
+    .chart-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 3px; opacity: 0; transition: opacity .3s;
+    }
+    .chart-card.blue-top::before  { background: linear-gradient(90deg, var(--blue-sky), var(--blue-mid)); }
+    .chart-card.gold-top::before  { background: linear-gradient(90deg, var(--gold-light), var(--gold)); }
+    .chart-card.green-top::before { background: linear-gradient(90deg, var(--green-light), var(--green-mid)); }
+    .chart-card.red-top::before   { background: linear-gradient(90deg, #ff8a80, var(--red-neg)); }
+    .chart-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); border-color: var(--blue-pale); }
+    .chart-card:hover::before { opacity: 1; }
+
+    .card-tag {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-family: 'DM Mono', monospace; font-size: .7rem; font-weight: 500;
+      padding: 3px 9px; border-radius: 20px;
+      margin-bottom: 10px; text-transform: uppercase; letter-spacing: .04em;
+    }
+    .card-tag.blue  { color: var(--blue-mid); background: var(--blue-pale); }
+    .card-tag.gold  { color: #8a6300; background: var(--gold-pale); }
+    .card-tag.green { color: var(--green-mid); background: var(--green-pale); }
+    .card-tag.red   { color: var(--red-neg); background: var(--red-pale); }
+
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem; font-weight: 700; color: var(--text-dark); margin-bottom: 4px;
+    }
+    .card-sub { font-size: .8rem; color: var(--text-light); margin-bottom: 16px; }
+    .chart-placeholder { border-radius: 10px; overflow: hidden; position: relative; }
+    .chart-placeholder.large  { height: 230px; }
+    .chart-placeholder.medium { height: 170px; }
+    .chart-placeholder.small  { height: 130px; }
+
+    /* ─── CHART BACKGROUNDS ─────────────────────────────── */
+    /* Line chart */
+    .line-bg {
+      width: 100%; height: 100%;
+      background: linear-gradient(180deg, #f0f8ff 0%, #e3f2fd 100%);
+      position: relative; overflow: hidden;
+    }
+    .line-bg svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .axis-label {
+      position: absolute; font-size: .62rem;
+      font-family: 'DM Mono', monospace; color: var(--text-light);
+    }
+
+    /* Candlestick chart */
+    .candle-bg {
+      width: 100%; height: 100%;
+      background: linear-gradient(180deg, #0d1b2a 0%, #0a2744 100%);
+      position: relative; overflow: hidden;
+    }
+    .candle-bg svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .candle-bg .grid-line {
+      stroke: rgba(255,255,255,.05); stroke-width: 1;
+    }
+
+    /* Heatmap */
+    .heatmap-bg {
+      width: 100%; height: 100%;
+      background: #fefcf8;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 3px; padding: 10px;
+    }
+    .heat-cell {
+      border-radius: 4px; display: flex; align-items: center;
+      justify-content: center; font-size: .52rem;
+      font-family: 'DM Mono', monospace; font-weight: 500;
+      cursor: pointer; transition: all .2s; flex-direction: column; gap: 1px;
+    }
+    .heat-cell:hover { transform: scale(1.05); z-index: 1; }
+    .heat-cell .h-sym { color: rgba(255,255,255,.9); font-size: .58rem; }
+    .heat-cell .h-val { color: rgba(255,255,255,.65); font-size: .5rem; }
+
+    /* Bar chart horizontal */
+    .bar-chart-bg {
+      width: 100%; height: 100%;
+      background: linear-gradient(180deg, #f9f6f0 0%, #fefcf8 100%);
+      padding: 12px 16px; display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .hbar-row { display: flex; align-items: center; gap: 8px; }
+    .hbar-country { font-size: .64rem; color: var(--text-light); font-family: 'DM Mono', monospace; width: 28px; flex-shrink: 0; text-align: right; }
+    .hbar-track { flex: 1; height: 14px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .hbar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 6px; font-size: .56rem; font-family: 'DM Mono', monospace; color: rgba(255,255,255,.9); transition: width 1.5s cubic-bezier(.25,.8,.25,1); width: 0%; }
+    .hbar-val { font-size: .62rem; font-family: 'DM Mono', monospace; color: var(--text-light); width: 38px; flex-shrink: 0; text-align: right; }
+
+    /* Donut */
+    .donut-bg {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center; gap: 20px;
+      background: #fefcf8; padding: 10px;
+    }
+    .donut-legend-list { display: flex; flex-direction: column; gap: 6px; }
+    .donut-leg-item { display: flex; align-items: center; gap: 6px; font-size: .7rem; color: var(--text-mid); }
+    .donut-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ─── FEATURED GRID ─────────────────────────────────── */
+    .featured-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    .secondary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    @media (max-width: 900px) {
+      .featured-grid { grid-template-columns: 1fr; }
+      .secondary-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 560px) {
+      .secondary-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ─── MARKETS INDICES SECTION ───────────────────────── */
+    .indices-section {
+      background: var(--blue-deep);
+      padding: clamp(2rem, 4vw, 3rem) clamp(1rem, 4vw, 3rem);
+      position: relative; overflow: hidden;
+    }
+    .indices-section::before {
+      content: ''; position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .indices-inner { position: relative; max-width: 1380px; margin: 0 auto; }
+    .indices-title {
+      font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700;
+      color: #fff; margin-bottom: .4rem;
+    }
+    .indices-title span { color: var(--gold); }
+    .indices-sub { font-size: .85rem; color: rgba(255,255,255,.5); margin-bottom: 1.8rem; }
+    .indices-grid {
+      display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px;
+    }
+    @media (max-width: 1100px) { .indices-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 600px)  { .indices-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .index-card {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 14px; padding: 16px 14px;
+      transition: all .3s; cursor: pointer;
+      backdrop-filter: blur(6px);
+    }
+    .index-card:hover { background: rgba(255,255,255,.1); transform: translateY(-3px); border-color: rgba(201,168,76,.4); }
+    .index-region {
+      font-size: .63rem; text-transform: uppercase; letter-spacing: .08em;
+      color: rgba(255,255,255,.4); margin-bottom: 4px;
+    }
+    .index-name { font-size: .82rem; font-weight: 600; color: rgba(255,255,255,.85); margin-bottom: 6px; }
+    .index-value { font-family: 'DM Mono', monospace; font-size: 1.15rem; font-weight: 500; color: #fff; }
+    .index-chg {
+      display: flex; align-items: center; gap: 4px;
+      font-family: 'DM Mono', monospace; font-size: .72rem; margin-top: 5px;
+    }
+    .index-chg.up   { color: #69f0ae; }
+    .index-chg.down { color: #ff5252; }
+    .index-mini-chart { margin-top: 10px; }
+
+    /* ─── CRYPTO SECTION ────────────────────────────────── */
+    .crypto-section {
+      padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 4vw, 3rem);
+      max-width: 1380px; margin: 0 auto;
+    }
+    .crypto-table {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-sm);
+    }
+    .crypto-thead {
+      display: grid; grid-template-columns: 40px 1.5fr 1fr 1fr 1fr 1fr 100px;
+      padding: 12px 20px;
+      background: var(--warm-white); border-bottom: 1px solid var(--border);
+      font-size: .72rem; font-weight: 600; color: var(--text-light);
+      text-transform: uppercase; letter-spacing: .06em; gap: 12px;
+    }
+    .crypto-row-full {
+      display: grid; grid-template-columns: 40px 1.5fr 1fr 1fr 1fr 1fr 100px;
+      padding: 13px 20px;
+      border-bottom: 1px solid #f4f1ec; gap: 12px;
+      align-items: center; cursor: pointer; transition: all .2s;
+    }
+    .crypto-row-full:last-child { border-bottom: none; }
+    .crypto-row-full:hover { background: var(--blue-pale); }
+    .cr-rank { font-family: 'DM Mono', monospace; font-size: .72rem; color: var(--text-light); }
+    .cr-coin { display: flex; align-items: center; gap: 9px; }
+    .cr-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .cr-cname { font-weight: 600; font-size: .85rem; color: var(--text-dark); }
+    .cr-csym { font-size: .72rem; color: var(--text-light); font-family: 'DM Mono', monospace; }
+    .cr-price { font-family: 'DM Mono', monospace; font-size: .84rem; color: var(--text-dark); }
+    .cr-chg { font-family: 'DM Mono', monospace; font-size: .82rem; font-weight: 600; }
+    .cr-chg.up   { color: var(--green-pos); }
+    .cr-chg.down { color: var(--red-neg); }
+    .cr-mcap { font-size: .8rem; color: var(--text-mid); font-family: 'DM Mono', monospace; }
+    .cr-sparkline { display: flex; align-items: center; }
+    .cr-sparkline svg { width: 100%; height: 30px; }
+
+    @media (max-width: 900px) {
+      .crypto-thead { grid-template-columns: 40px 1.5fr 1fr 1fr; }
+      .crypto-thead .hide-mob { display: none; }
+      .crypto-row-full { grid-template-columns: 40px 1.5fr 1fr 1fr; }
+      .crypto-row-full .hide-mob { display: none; }
+    }
+    @media (max-width: 560px) {
+      .crypto-thead { grid-template-columns: 1.5fr 1fr 1fr; }
+      .crypto-row-full { grid-template-columns: 1.5fr 1fr 1fr; }
+      .cr-rank { display: none; }
+    }
+
+    /* ─── CALCULATORS SECTION ───────────────────────────── */
+    .calc-section {
+      background: linear-gradient(135deg, var(--gold-pale) 0%, var(--warm-white) 100%);
+      padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 4vw, 3rem);
+      border-top: 1px solid rgba(201,168,76,.2);
+      border-bottom: 1px solid rgba(201,168,76,.2);
+    }
+    .calc-inner { max-width: 1380px; margin: 0 auto; }
+    .calc-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+    }
+    @media (max-width: 900px) { .calc-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 500px) { .calc-grid { grid-template-columns: 1fr; } }
+
+    .calc-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 16px; padding: 20px; box-shadow: var(--shadow-sm);
+      transition: all .3s; cursor: pointer; position: relative; overflow: hidden;
+    }
+    .calc-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: rgba(201,168,76,.4); }
+    .calc-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; margin-bottom: 12px;
+    }
+    .calc-name { font-family: 'Playfair Display', serif; font-size: .95rem; font-weight: 700; color: var(--blue-deep); margin-bottom: 5px; }
+    .calc-desc { font-size: .78rem; color: var(--text-light); line-height: 1.5; }
+    .calc-arrow {
+      position: absolute; bottom: 16px; right: 16px;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--blue-pale); color: var(--blue-mid);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; transition: all .2s;
+    }
+    .calc-card:hover .calc-arrow { background: var(--blue-mid); color: #fff; }
+
+    /* ─── WORLD DATA SECTION ────────────────────────────── */
+    .world-section {
+      padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 4vw, 3rem);
+      max-width: 1380px; margin: 0 auto;
+    }
+
+    /* ─── BLOG SECTION ──────────────────────────────────── */
+    .blog-section {
+      background: var(--warm-white); border-top: 1px solid var(--border);
+      padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 4vw, 3rem);
+    }
+    .blog-inner { max-width: 1380px; margin: 0 auto; }
+    .blog-grid {
+      display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 20px;
+    }
+    @media (max-width: 900px) { .blog-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 560px) { .blog-grid { grid-template-columns: 1fr; } }
+
+    .blog-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-sm);
+      transition: all .3s; cursor: pointer;
+    }
+    .blog-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
+    .blog-thumb {
+      height: 160px; position: relative; overflow: hidden;
+    }
+    .blog-thumb.featured { height: 220px; }
+    .blog-thumb-bg {
+      width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem; position: relative;
+    }
+    .blog-body { padding: 18px 20px; }
+    .blog-tag {
+      display: inline-flex; align-items: center;
+      font-size: .68rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .06em; padding: 2px 8px; border-radius: 8px; margin-bottom: 8px;
+    }
+    .blog-title {
+      font-family: 'Playfair Display', serif; font-size: .98rem; font-weight: 700;
+      color: var(--text-dark); line-height: 1.35; margin-bottom: 8px;
+    }
+    .blog-excerpt { font-size: .78rem; color: var(--text-light); line-height: 1.55; margin-bottom: 12px; }
+    .blog-meta { display: flex; align-items: center; gap: 12px; font-size: .72rem; color: var(--text-light); }
+    .blog-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--text-light); }
+
+    /* ─── BROWSE TOPICS ─────────────────────────────────── */
+    .topics-section {
+      background: var(--green-deep);
+      padding: clamp(2.5rem, 5vw, 4rem) clamp(1rem, 4vw, 3rem);
+      position: relative; overflow: hidden;
+    }
+    .topics-section::before {
+      content: ''; position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .topics-inner { position: relative; max-width: 1380px; margin: 0 auto; }
+    .topics-head {
+      font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700;
+      color: var(--green-pale); margin-bottom: 2rem;
+    }
+    .topics-grid {
+      display: grid; grid-template-columns: 1fr 1.6fr 1fr; gap: 24px;
+    }
+    @media (max-width: 900px) { .topics-grid { grid-template-columns: 1fr; } }
+
+    .topic-brand {
+      padding: 26px; border: 1px solid rgba(255,255,255,.1);
+      border-radius: 16px; background: rgba(255,255,255,.06);
+      backdrop-filter: blur(8px); transition: all .3s;
+    }
+    .topic-brand:hover { background: rgba(255,255,255,.1); transform: translateY(-3px); }
+    .brand-icon {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--blue-sky), var(--gold));
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-size: 20px; margin-bottom: 14px;
+    }
+    .brand-name {
+      font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700;
+      color: var(--green-pale); margin-bottom: 8px;
+    }
+    .brand-tagline { font-size: .82rem; color: rgba(183,228,199,.65); line-height: 1.6; }
+    .topic-col-head {
+      display: flex; align-items: center; gap: 6px; font-size: .78rem; font-weight: 600;
+      color: var(--green-light); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px;
+    }
+    .topic-link-item {
+      padding: 7px 0; font-size: .83rem; color: rgba(183,228,199,.75);
+      cursor: pointer; transition: all .2s; border-bottom: 1px solid rgba(255,255,255,.06);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .topic-link-item:last-child { border-bottom: none; }
+    .topic-link-item:hover { color: #fff; padding-left: 4px; }
+    .topic-link-item .tli-arrow { opacity: 0; transition: opacity .2s; font-size: .8rem; }
+    .topic-link-item:hover .tli-arrow { opacity: 1; }
+
+    /* ─── FOOTER ────────────────────────────────────────── */
+    footer {
+      background: var(--brown-deep);
+      color: var(--brown-pale);
+      padding: clamp(2rem, 4vw, 3rem) clamp(1rem, 4vw, 3rem) 0;
+    }
+    .footer-inner { max-width: 1380px; margin: 0 auto; }
+    .footer-top {
+      display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr 1fr; gap: 32px;
+      padding-bottom: 2.5rem;
+    }
+    @media (max-width: 900px) { .footer-top { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 500px) { .footer-top { grid-template-columns: 1fr; } }
+
+    .footer-brand p { font-size: .83rem; color: rgba(215,204,200,.6); line-height: 1.7; margin-top: 10px; }
+    .footer-logo {
+      display: flex; align-items: center; gap: 9px;
+      font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700;
+      color: var(--brown-pale);
+    }
+    .footer-logo-icon {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--blue-mid), var(--gold));
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+    }
+    .social-row { display: flex; gap: 8px; margin-top: 16px; }
+    .social-btn {
+      width: 34px; height: 34px; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.1);
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(215,204,200,.6); transition: all .2s; cursor: pointer;
+    }
+    .social-btn:hover { border-color: rgba(255,255,255,.3); color: #fff; background: rgba(255,255,255,.08); }
+
+    .footer-col h4 {
+      font-size: .82rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .08em; color: var(--brown-pale); margin-bottom: 14px;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .footer-col ul a {
+      font-size: .82rem; color: rgba(215,204,200,.55);
+      transition: color .2s;
+    }
+    .footer-col ul a:hover { color: var(--brown-pale); }
+
+    .footer-divider { border: none; border-top: 1px solid rgba(255,255,255,.08); margin: 0; }
+    .footer-bottom {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.2rem 0; flex-wrap: wrap; gap: 10px;
+      font-size: .76rem; color: rgba(215,204,200,.4);
+    }
+    .footer-bottom-links { display: flex; gap: 20px; }
+    .footer-bottom-links a { transition: color .2s; }
+    .footer-bottom-links a:hover { color: var(--brown-pale); }
+    .footer-disclaimer {
+      font-size: .72rem; color: rgba(215,204,200,.3); line-height: 1.6;
+      padding: 1rem 0; border-top: 1px solid rgba(255,255,255,.05);
+      margin-top: .5rem;
+    }
+
+    /* ─── NEWSLETTER STRIP ──────────────────────────────── */
+    .newsletter-strip {
+      background: linear-gradient(135deg, var(--blue-deep), #0d3a6e);
+      padding: clamp(1.5rem, 3vw, 2.5rem) clamp(1rem, 4vw, 3rem);
+    }
+    .nl-inner {
+      max-width: 1380px; margin: 0 auto;
+      display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+    }
+    .nl-text { flex: 1; min-width: 200px; }
+    .nl-title {
+      font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700;
+      color: #fff; margin-bottom: 4px;
+    }
+    .nl-sub { font-size: .82rem; color: rgba(255,255,255,.5); }
+    .nl-form { display: flex; gap: 10px; flex-wrap: wrap; }
+    .nl-input {
+      padding: 10px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,.2);
+      background: rgba(255,255,255,.1); color: #fff; font-family: 'DM Sans', sans-serif;
+      font-size: .85rem; width: 260px; outline: none; transition: all .2s;
+    }
+    .nl-input::placeholder { color: rgba(255,255,255,.35); }
+    .nl-input:focus { border-color: var(--gold); background: rgba(255,255,255,.15); }
+    .nl-btn {
+      padding: 10px 20px; background: var(--gold); color: var(--blue-deep);
+      font-weight: 700; font-size: .85rem; border-radius: 8px; border: none;
+      cursor: pointer; transition: all .2s; white-space: nowrap;
+    }
+    .nl-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+    /* ─── MARKET LIVE BADGE ─────────────────────────────── */
+    .live-dot {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: .66rem; font-family: 'DM Mono', monospace;
+      color: #69f0ae; margin-left: 8px;
+    }
+    .live-dot::before {
+      content: '';
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #69f0ae;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    /* ─── MINI SVG SPARKLINES ───────────────────────────── */
+    .sparkline-path {
+      fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+      stroke-dasharray: 600; stroke-dashoffset: 600;
+      animation: lineGrow 1.8s ease forwards .6s;
+    }
+    .sparkline-area { opacity: .15; }
+  </style>
+</head>
+<body>
+
+<!-- ═══ LIVE TICKER ═════════════════════════════════════════ -->
+<div class="ticker-bar">
+  <div class="ticker-label">LIVE</div>
+  <div class="ticker-track">
+    <div class="ticker-inner" id="ticker">
+      <!-- duplicated for seamless loop -->
+      <div class="tick-item"><span class="tick-name">S&P 500</span><span class="tick-val">5,928.42</span><span class="tick-chg up">▲ +0.74%</span></div>
+      <div class="tick-item"><span class="tick-name">NASDAQ</span><span class="tick-val">19,243.18</span><span class="tick-chg up">▲ +1.12%</span></div>
+      <div class="tick-item"><span class="tick-name">DOW</span><span class="tick-val">43,115.92</span><span class="tick-chg down">▼ −0.18%</span></div>
+      <div class="tick-item"><span class="tick-name">FTSE 100</span><span class="tick-val">8,302.60</span><span class="tick-chg up">▲ +0.32%</span></div>
+      <div class="tick-item"><span class="tick-name">DAX</span><span class="tick-val">22,784.05</span><span class="tick-chg up">▲ +0.55%</span></div>
+      <div class="tick-item"><span class="tick-name">NIKKEI</span><span class="tick-val">38,459.30</span><span class="tick-chg down">▼ −0.24%</span></div>
+      <div class="tick-item"><span class="tick-name">HSI</span><span class="tick-val">23,605.17</span><span class="tick-chg up">▲ +0.88%</span></div>
+      <div class="tick-item"><span class="tick-name">BTC</span><span class="tick-val">$84,210</span><span class="tick-chg up">▲ +2.34%</span></div>
+      <div class="tick-item"><span class="tick-name">ETH</span><span class="tick-val">$1,624</span><span class="tick-chg down">▼ −0.81%</span></div>
+      <div class="tick-item"><span class="tick-name">GOLD</span><span class="tick-val">$3,254/oz</span><span class="tick-chg up">▲ +0.46%</span></div>
+      <div class="tick-item"><span class="tick-name">OIL (WTI)</span><span class="tick-val">$61.45</span><span class="tick-chg down">▼ −1.02%</span></div>
+      <div class="tick-item"><span class="tick-name">EUR/USD</span><span class="tick-val">1.1362</span><span class="tick-chg up">▲ +0.22%</span></div>
+      <div class="tick-item"><span class="tick-name">USD/JPY</span><span class="tick-val">142.55</span><span class="tick-chg down">▼ −0.31%</span></div>
+      <!-- duplicate -->
+      <div class="tick-item"><span class="tick-name">S&P 500</span><span class="tick-val">5,928.42</span><span class="tick-chg up">▲ +0.74%</span></div>
+      <div class="tick-item"><span class="tick-name">NASDAQ</span><span class="tick-val">19,243.18</span><span class="tick-chg up">▲ +1.12%</span></div>
+      <div class="tick-item"><span class="tick-name">DOW</span><span class="tick-val">43,115.92</span><span class="tick-chg down">▼ −0.18%</span></div>
+      <div class="tick-item"><span class="tick-name">FTSE 100</span><span class="tick-val">8,302.60</span><span class="tick-chg up">▲ +0.32%</span></div>
+      <div class="tick-item"><span class="tick-name">DAX</span><span class="tick-val">22,784.05</span><span class="tick-chg up">▲ +0.55%</span></div>
+      <div class="tick-item"><span class="tick-name">NIKKEI</span><span class="tick-val">38,459.30</span><span class="tick-chg down">▼ −0.24%</span></div>
+      <div class="tick-item"><span class="tick-name">HSI</span><span class="tick-val">23,605.17</span><span class="tick-chg up">▲ +0.88%</span></div>
+      <div class="tick-item"><span class="tick-name">BTC</span><span class="tick-val">$84,210</span><span class="tick-chg up">▲ +2.34%</span></div>
+      <div class="tick-item"><span class="tick-name">ETH</span><span class="tick-val">$1,624</span><span class="tick-chg down">▼ −0.81%</span></div>
+      <div class="tick-item"><span class="tick-name">GOLD</span><span class="tick-val">$3,254/oz</span><span class="tick-chg up">▲ +0.46%</span></div>
+      <div class="tick-item"><span class="tick-name">OIL (WTI)</span><span class="tick-val">$61.45</span><span class="tick-chg down">▼ −1.02%</span></div>
+      <div class="tick-item"><span class="tick-name">EUR/USD</span><span class="tick-val">1.1362</span><span class="tick-chg up">▲ +0.22%</span></div>
+      <div class="tick-item"><span class="tick-name">USD/JPY</span><span class="tick-val">142.55</span><span class="tick-chg down">▼ −0.31%</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ NAV ═════════════════════════════════════════════════ -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="logo">
+      <div class="logo-icon">💹</div>
+      <div class="logo-text">
+        <span class="l1">World Finance Dashboard</span>
+        <span class="l2">WFD · worldfinancedashboard.com</span>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#markets" class="active">Markets</a></li>
+      <li><a href="#crypto">Crypto</a></li>
+      <li><a href="#calculators">Calculators</a></li>
+      <li><a href="#world-data">World Data</a></li>
+      <li><a href="#forex">Forex</a></li>
+      <li><a href="#blog">Blog</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="btn-ghost">Sign In</button>
+      <button class="btn-primary">Get Started</button>
+      <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <ul>
+    <li><a href="#markets" onclick="toggleMenu()">📈 Markets &amp; Indexes</a></li>
+    <li><a href="#crypto" onclick="toggleMenu()">₿ Cryptocurrency</a></li>
+    <li><a href="#calculators" onclick="toggleMenu()">🧮 Financial Calculators</a></li>
+    <li><a href="#world-data" onclick="toggleMenu()">🌍 World Economic Data</a></li>
+    <li><a href="#forex" onclick="toggleMenu()">💱 Forex</a></li>
+    <li><a href="#blog" onclick="toggleMenu()">✍️ Blog &amp; Analysis</a></li>
+  </ul>
+  <div class="mobile-menu-divider"></div>
+  <a href="#" class="btn-primary">Get Started Free</a>
+</div>
+
+<!-- ═══ CATEGORY BAR ═════════════════════════════════════════ -->
+<div class="cat-bar">
+  <div class="cat-bar-inner">
+    <div class="cat-item active">🏦 All Markets</div>
+    <span class="cat-sep">·</span>
+    <div class="cat-item">🇺🇸 US Stocks</div>
+    <span class="cat-sep">·</span>
+    <div class="cat-item">🌍 Global Indices</div>
+    <span class="cat-sep">·</span>
+    <div class="cat-item">₿ Crypto</div>
+    <span class="cat-sep">·</span>
+    <div class="cat-item">💱 Forex</div>
+    <span class="cat-sep">·</span>
+    <div class="cat-item">🥇 Commodities</div>
+    <span class="cat-sep">·</span>
+    <div class="cat-item">📊 World GDP</div>
+    <span class="cat-sep">·</span>
+    <div class="cat-item">📉 Inflation</div>
+    <span class="cat-sep">·</span>
+    <div class="cat-item">💸 Debt</div>
+    <span class="cat-sep">·</span>
+    <div class="cat-item">🧮 Calculators</div>
+  </div>
+</div>
+
+<!-- ═══ HERO ══════════════════════════════════════════════════ -->
+<div class="hero">
+  <div class="hero-inner">
+
+    <!-- LEFT SIDE PANEL -->
+    <div class="hero-side left-side">
+
+      <!-- S&P 500 card -->
+      <div class="hw-market blue">
+        <div class="mkt-label">S&amp;P 500</div>
+        <div class="mkt-val">5,928.42</div>
+        <div><span class="mkt-chg up">▲ +43.12 (+0.74%)</span></div>
+        <div class="mkt-sub">NYSE · Apr 17, 2026</div>
+        <svg viewBox="0 0 100 28" style="margin-top:8px;width:100%;height:28px;">
+          <polyline points="0,22 10,20 20,18 28,16 36,19 44,13 54,10 62,8 72,11 80,7 90,5 100,4"
+            fill="none" stroke="#4a9fd4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <!-- NASDAQ card -->
+      <div class="hw-market blue">
+        <div class="mkt-label">NASDAQ Composite</div>
+        <div class="mkt-val">19,243.18</div>
+        <div><span class="mkt-chg up">▲ +213.40 (+1.12%)</span></div>
+        <div class="mkt-sub">NASDAQ · Apr 17, 2026</div>
+        <svg viewBox="0 0 100 28" style="margin-top:8px;width:100%;height:28px;">
+          <polyline points="0,24 10,21 20,19 28,22 36,17 44,14 54,12 62,9 72,11 80,8 90,6 100,4"
+            fill="none" stroke="#4a9fd4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <!-- Gold card -->
+      <div class="hw-gold">
+        <div class="hw-gold-label">🥇 Gold Spot</div>
+        <div class="hw-gold-val">$3,254.60 / oz</div>
+        <div style="margin-top:5px;font-size:.7rem;color:var(--gold);font-weight:600;">▲ +0.46% Today</div>
+        <div style="margin-top:3px;font-size:.68rem;color:var(--brown-mid)">Safe-haven demand elevated</div>
+      </div>
+
+      <!-- Dark sparkline card -->
+      <div class="hw-wave">
+        <div class="hw-wave-label">BTC / USD</div>
+        <div class="hw-wave-val">$84,210</div>
+        <span class="hw-wave-chg">▲ +2.34%</span>
+        <div class="hw-wave-sub">24h Vol: $38.2B</div>
+        <svg viewBox="0 0 100 28" style="margin-top:8px;width:100%;height:28px;">
+          <polyline points="0,20 10,18 20,22 28,15 36,18 44,10 54,14 62,8 72,12 80,7 90,5 100,4"
+            fill="none" stroke="#69f0ae" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+    </div>
+
+    <!-- CENTER -->
+    <div class="hero-center">
+      <h1>Your <span class="accent">Financial</span> Intelligence<br><span class="accent-blue">Dashboard</span></h1>
+      <p class="hero-sub">Real-time markets, crypto, forex, global economic data and powerful financial calculators — all in one place.</p>
+      <div class="search-wrap">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Search markets, crypto, calculators, indicators…">
+      </div>
+      <div class="stats-bar">
+        <div class="stat">
+          <div class="stat-num" id="cnt-markets">180</div>
+          <div class="stat-label">Markets</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num" id="cnt-crypto">450</div>
+          <div class="stat-label">Crypto Coins</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num" id="cnt-calc">30</div>
+          <div class="stat-label">Calculators</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num" id="cnt-countries">195</div>
+          <div class="stat-label">Countries</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE PANEL -->
+    <div class="hero-side right-side">
+
+      <!-- GDP bar chart card -->
+      <div class="hw-bars">
+        <div class="hw-bars-title">Top Economies by GDP 2025</div>
+        <div class="bar-row">
+          <div class="bar-name">USA</div>
+          <div class="bar-track"><div class="bar-fill" style="background:var(--blue-mid);" data-w="100"></div></div>
+          <div class="bar-pct">$30.3T</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-name">CHN</div>
+          <div class="bar-track"><div class="bar-fill" style="background:var(--red-neg);" data-w="62"></div></div>
+          <div class="bar-pct">$18.8T</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-name">DEU</div>
+          <div class="bar-track"><div class="bar-fill" style="background:var(--green-mid);" data-w="15"></div></div>
+          <div class="bar-pct">$4.4T</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-name">JPN</div>
+          <div class="bar-track"><div class="bar-fill" style="background:var(--gold);" data-w="14"></div></div>
+          <div class="bar-pct">$4.2T</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-name">IND</div>
+          <div class="bar-track"><div class="bar-fill" style="background:var(--brown-mid);" data-w="12"></div></div>
+          <div class="bar-pct">$3.9T</div>
+        </div>
+      </div>
+
+      <!-- EUR/USD forex card -->
+      <div class="hw-market gold">
+        <div class="mkt-label">EUR / USD</div>
+        <div class="mkt-val">1.1362</div>
+        <div><span class="mkt-chg up">▲ +0.0025 (+0.22%)</span></div>
+        <div class="mkt-sub">Forex · Mid-market rate</div>
+      </div>
+
+      <!-- Crypto mini -->
+      <div class="hw-crypto">
+        <div class="hw-crypto-title">Top Crypto</div>
+        <div class="crypto-row">
+          <div><div class="crypto-sym">BTC</div><div class="crypto-name">Bitcoin</div></div>
+          <div class="crypto-price">$84,210</div>
+          <div class="crypto-chg up">+2.34%</div>
+        </div>
+        <div class="crypto-row">
+          <div><div class="crypto-sym">ETH</div><div class="crypto-name">Ethereum</div></div>
+          <div class="crypto-price">$1,624</div>
+          <div class="crypto-chg down">−0.81%</div>
+        </div>
+        <div class="crypto-row">
+          <div><div class="crypto-sym">BNB</div><div class="crypto-name">BNB Chain</div></div>
+          <div class="crypto-price">$602</div>
+          <div class="crypto-chg up">+1.15%</div>
+        </div>
+        <div class="crypto-row">
+          <div><div class="crypto-sym">SOL</div><div class="crypto-name">Solana</div></div>
+          <div class="crypto-price">$128.40</div>
+          <div class="crypto-chg down">−1.43%</div>
+        </div>
+      </div>
+
+      <!-- Oil card -->
+      <div class="hw-market red">
+        <div class="mkt-label">WTI Crude Oil</div>
+        <div class="mkt-val">$61.45</div>
+        <div><span class="mkt-chg down">▼ −0.63 (−1.02%)</span></div>
+        <div class="mkt-sub">NYMEX · per barrel</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══ GLOBAL INDICES ════════════════════════════════════════ -->
+<section class="indices-section" id="markets">
+  <div class="indices-inner">
+    <h2 class="indices-title">Global Market <span>Indices</span> <span class="live-dot">LIVE</span></h2>
+    <p class="indices-sub">Real-time data from major stock exchanges worldwide</p>
+    <div class="indices-grid reveal">
+      <!-- US -->
+      <div class="index-card">
+        <div class="index-region">United States</div>
+        <div class="index-name">S&amp;P 500</div>
+        <div class="index-value">5,928.42</div>
+        <div class="index-chg up">▲ +43.12 &nbsp;+0.74%</div>
+        <svg class="index-mini-chart" viewBox="0 0 80 20" height="20">
+          <polyline points="0,18 15,15 25,12 35,14 45,9 55,7 65,5 80,3" fill="none" stroke="#69f0ae" stroke-width="1.3"/>
+        </svg>
+      </div>
+      <div class="index-card">
+        <div class="index-region">United States</div>
+        <div class="index-name">NASDAQ 100</div>
+        <div class="index-value">21,044.63</div>
+        <div class="index-chg up">▲ +232.80 &nbsp;+1.12%</div>
+        <svg class="index-mini-chart" viewBox="0 0 80 20" height="20">
+          <polyline points="0,17 15,14 25,16 35,11 45,8 55,6 65,4 80,2" fill="none" stroke="#69f0ae" stroke-width="1.3"/>
+        </svg>
+      </div>
+      <div class="index-card">
+        <div class="index-region">United States</div>
+        <div class="index-name">Dow Jones</div>
+        <div class="index-value">43,115.92</div>
+        <div class="index-chg down">▼ −77.60 &nbsp;−0.18%</div>
+        <svg class="index-mini-chart" viewBox="0 0 80 20" height="20">
+          <polyline points="0,8 15,9 25,7 35,11 45,13 55,12 65,14 80,15" fill="none" stroke="#ff5252" stroke-width="1.3"/>
+        </svg>
+      </div>
+      <!-- Europe -->
+      <div class="index-card">
+        <div class="index-region">United Kingdom</div>
+        <div class="index-name">FTSE 100</div>
+        <div class="index-value">8,302.60</div>
+        <div class="index-chg up">▲ +26.40 &nbsp;+0.32%</div>
+        <svg class="index-mini-chart" viewBox="0 0 80 20" height="20">
+          <polyline points="0,14 15,12 25,13 35,10 45,9 55,8 65,7 80,6" fill="none" stroke="#69f0ae" stroke-width="1.3"/>
+        </svg>
+      </div>
+      <div class="index-card">
+        <div class="index-region">Germany</div>
+        <div class="index-name">DAX 40</div>
+        <div class="index-value">22,784.05</div>
+        <div class="index-chg up">▲ +124.30 &nbsp;+0.55%</div>
+        <svg class="index-mini-chart" viewBox="0 0 80 20" height="20">
+          <polyline points="0,16 15,13 25,11 35,12 45,9 55,7 65,6 80,4" fill="none" stroke="#69f0ae" stroke-width="1.3"/>
+        </svg>
+      </div>
+      <!-- Asia -->
+      <div class="index-card">
+        <div class="index-region">Japan</div>
+        <div class="index-name">Nikkei 225</div>
+        <div class="index-value">38,459.30</div>
+        <div class="index-chg down">▼ −92.50 &nbsp;−0.24%</div>
+        <svg class="index-mini-chart" viewBox="0 0 80 20" height="20">
+          <polyline points="0,5 15,7 25,6 35,9 45,11 55,10 65,13 80,15" fill="none" stroke="#ff5252" stroke-width="1.3"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CHARTS SECTION ═══════════════════════════════════════ -->
+<div class="section" id="world-data">
+  <div class="section-header reveal">
+    <div>
+      <h2 class="section-title">Featured <span>Charts</span> &amp; Analysis</h2>
+      <p class="section-sub">Deep dives into global financial &amp; economic data</p>
+    </div>
+    <a href="#" class="view-all">View all charts →</a>
+  </div>
+
+  <div class="featured-grid reveal">
+    <!-- World GDP chart -->
+    <div class="chart-card blue-top">
+      <div class="card-tag blue">🌍 World GDP</div>
+      <div class="card-title">Global GDP Growth — Top 15 Economies</div>
+      <div class="card-sub">World Bank data · 2010–2025 · Annual % change</div>
+      <div class="chart-placeholder large">
+        <div class="bar-chart-bg">
+          <div class="hbar-row"><div class="hbar-country">USA</div><div class="hbar-track"><div class="hbar-fill" style="background:var(--blue-mid);width:0%" data-w="92">$30.3T</div></div><div class="hbar-val">$30.3T</div></div>
+          <div class="hbar-row"><div class="hbar-country">CHN</div><div class="hbar-track"><div class="hbar-fill" style="background:#e53935;width:0%" data-w="62">$18.8T</div></div><div class="hbar-val">$18.8T</div></div>
+          <div class="hbar-row"><div class="hbar-country">DEU</div><div class="hbar-track"><div class="hbar-fill" style="background:var(--green-mid);width:0%" data-w="14">$4.4T</div></div><div class="hbar-val">$4.4T</div></div>
+          <div class="hbar-row"><div class="hbar-country">JPN</div><div class="hbar-track"><div class="hbar-fill" style="background:var(--gold);width:0%" data-w="14">$4.2T</div></div><div class="hbar-val">$4.2T</div></div>
+          <div class="hbar-row"><div class="hbar-country">IND</div><div class="hbar-track"><div class="hbar-fill" style="background:#ff7043;width:0%" data-w="13">$3.9T</div></div><div class="hbar-val">$3.9T</div></div>
+          <div class="hbar-row"><div class="hbar-country">GBR</div><div class="hbar-track"><div class="hbar-fill" style="background:#5c6bc0;width:0%" data-w="10">$3.1T</div></div><div class="hbar-val">$3.1T</div></div>
+          <div class="hbar-row"><div class="hbar-country">FRA</div><div class="hbar-track"><div class="hbar-fill" style="background:#26a69a;width:0%" data-w="9">$2.9T</div></div><div class="hbar-val">$2.9T</div></div>
+          <div class="hbar-row"><div class="hbar-country">BRA</div><div class="hbar-track"><div class="hbar-fill" style="background:#66bb6a;width:0%" data-w="7">$2.1T</div></div><div class="hbar-val">$2.1T</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S&P 500 line chart — dark candle style -->
+    <div class="chart-card blue-top">
+      <div class="card-tag blue">📈 Markets</div>
+      <div class="card-title">S&amp;P 500 — 5-Year Performance</div>
+      <div class="card-sub">Monthly close · Jan 2020 – Apr 2026</div>
+      <div class="chart-placeholder large">
+        <div class="candle-bg">
+          <svg viewBox="0 0 400 220" preserveAspectRatio="none">
+            <!-- grid -->
+            <line x1="0" y1="44" x2="400" y2="44" class="grid-line"/>
+            <line x1="0" y1="88" x2="400" y2="88" class="grid-line"/>
+            <line x1="0" y1="132" x2="400" y2="132" class="grid-line"/>
+            <line x1="0" y1="176" x2="400" y2="176" class="grid-line"/>
+            <!-- area fill -->
+            <defs>
+              <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#4a9fd4" stop-opacity=".35"/>
+                <stop offset="100%" stop-color="#4a9fd4" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,200 L0,185 C20,183 40,175 60,160 C80,145 90,170 110,155 C130,140 140,130 160,118 C180,106 200,100 220,85 C240,70 260,65 280,55 C300,45 320,40 340,35 C360,30 380,28 400,22 L400,220 Z"
+              fill="url(#areaGrad)"/>
+            <!-- main line -->
+            <path d="M0,185 C20,183 40,175 60,160 C80,145 90,170 110,155 C130,140 140,130 160,118 C180,106 200,100 220,85 C240,70 260,65 280,55 C300,45 320,40 340,35 C360,30 380,28 400,22"
+              fill="none" stroke="#4a9fd4" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span class="axis-label" style="bottom:6px;left:8px;color:rgba(255,255,255,.3)">2020</span>
+          <span class="axis-label" style="bottom:6px;right:8px;color:rgba(255,255,255,.3)">2026</span>
+          <span class="axis-label" style="top:8px;right:8px;color:#69f0ae;font-size:.7rem;">+148% ↑</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="secondary-grid reveal">
+    <!-- Inflation heatmap -->
+    <div class="chart-card red-top">
+      <div class="card-tag red">📉 Inflation</div>
+      <div class="card-title">Global Inflation Heatmap</div>
+      <div class="card-sub">CPI Annual % · 2025 · IMF Data</div>
+      <div class="chart-placeholder medium">
+        <div class="heatmap-bg">
+          <div class="heat-cell" style="background:#c62828;" title="Argentina 211%"><span class="h-sym">ARG</span><span class="h-val">211%</span></div>
+          <div class="heat-cell" style="background:#e53935;"><span class="h-sym">TUR</span><span class="h-val">44%</span></div>
+          <div class="heat-cell" style="background:#ef5350;"><span class="h-sym">VEN</span><span class="h-val">36%</span></div>
+          <div class="heat-cell" style="background:#ef9a9a;"><span class="h-sym">EGY</span><span class="h-val">23%</span></div>
+          <div class="heat-cell" style="background:#ffccbc;"><span class="h-sym">NGA</span><span class="h-val">18%</span></div>
+          <div class="heat-cell" style="background:#fff9c4;"><span class="h-sym">BRA</span><span class="h-val">4.8%</span></div>
+          <div class="heat-cell" style="background:#c8e6c9;"><span class="h-sym">USA</span><span class="h-val">2.9%</span></div>
+          <div class="heat-cell" style="background:#b2dfdb;"><span class="h-sym">CHN</span><span class="h-val">0.7%</span></div>
+          <div class="heat-cell" style="background:#dcedc8;"><span class="h-sym">DEU</span><span class="h-val">2.3%</span></div>
+          <div class="heat-cell" style="background:#e8f5e9;"><span class="h-sym">JPN</span><span class="h-val">2.1%</span></div>
+          <div class="heat-cell" style="background:#fff9c4;"><span class="h-sym">GBR</span><span class="h-val">3.2%</span></div>
+          <div class="heat-cell" style="background:#e8f5e9;"><span class="h-sym">FRA</span><span class="h-val">1.9%</span></div>
+          <div class="heat-cell" style="background:#ffecb3;"><span class="h-sym">IND</span><span class="h-val">5.4%</span></div>
+          <div class="heat-cell" style="background:#dcedc8;"><span class="h-sym">AUS</span><span class="h-val">2.6%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Forex line -->
+    <div class="chart-card gold-top">
+      <div class="card-tag gold">💱 Forex</div>
+      <div class="card-title">USD Index (DXY) — 1 Year</div>
+      <div class="card-sub">Dollar strength vs basket of 6 major currencies</div>
+      <div class="chart-placeholder medium">
+        <div class="line-bg">
+          <svg viewBox="0 0 300 160" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="dxyGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#c9a84c" stop-opacity=".3"/>
+                <stop offset="100%" stop-color="#c9a84c" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,60 L0,80 C20,78 40,72 60,68 C80,64 100,58 120,62 C140,66 150,74 170,70 C190,66 210,55 230,52 C250,49 270,60 290,75 L300,78 L300,160 L0,160 Z"
+              fill="url(#dxyGrad)"/>
+            <path d="M0,80 C20,78 40,72 60,68 C80,64 100,58 120,62 C140,66 150,74 170,70 C190,66 210,55 230,52 C250,49 270,60 290,75 L300,78"
+              fill="none" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span class="axis-label" style="bottom:5px;left:6px">Apr 25</span>
+          <span class="axis-label" style="bottom:5px;right:6px">Apr 26</span>
+          <span class="axis-label" style="top:6px;right:6px;color:#c9a84c">99.24 ▼</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Global Debt donut -->
+    <div class="chart-card green-top">
+      <div class="card-tag green">💸 Debt</div>
+      <div class="card-title">World Government Debt by Region</div>
+      <div class="card-sub">% of global public debt · IMF 2025</div>
+      <div class="chart-placeholder medium">
+        <div class="donut-bg">
+          <svg viewBox="0 0 120 120" width="120" height="120">
+            <circle cx="60" cy="60" r="48" fill="none" stroke="#f0ede8" stroke-width="18"/>
+            <!-- North America 35% -->
+            <circle cx="60" cy="60" r="48" fill="none" stroke="#1565c0" stroke-width="18"
+              stroke-dasharray="105.6 195.8" stroke-dashoffset="-28" transform="rotate(-90 60 60)"/>
+            <!-- Europe 24% -->
+            <circle cx="60" cy="60" r="48" fill="none" stroke="#52b788" stroke-width="18"
+              stroke-dasharray="72.4 228.9" stroke-dashoffset="-133.6" transform="rotate(-90 60 60)"/>
+            <!-- Asia 30% -->
+            <circle cx="60" cy="60" r="48" fill="none" stroke="#c9a84c" stroke-width="18"
+              stroke-dasharray="90.5 211" stroke-dashoffset="-206" transform="rotate(-90 60 60)"/>
+            <!-- Other 11% -->
+            <circle cx="60" cy="60" r="48" fill="none" stroke="#a1887f" stroke-width="18"
+              stroke-dasharray="33.2 268.1" stroke-dashoffset="-296.4" transform="rotate(-90 60 60)"/>
+            <text x="60" y="56" text-anchor="middle" font-size="10" font-family="DM Mono" fill="#0a2744" font-weight="500">$97.1T</text>
+            <text x="60" y="68" text-anchor="middle" font-size="7" font-family="DM Sans" fill="#7a7a7a">World Debt</text>
+          </svg>
+          <div class="donut-legend-list">
+            <div class="donut-leg-item"><div class="donut-dot" style="background:#1565c0;"></div>N. America 35%</div>
+            <div class="donut-leg-item"><div class="donut-dot" style="background:#52b788;"></div>Europe 24%</div>
+            <div class="donut-leg-item"><div class="donut-dot" style="background:#c9a84c;"></div>Asia 30%</div>
+            <div class="donut-leg-item"><div class="donut-dot" style="background:#a1887f;"></div>Other 11%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CRYPTO TABLE ══════════════════════════════════════════ -->
+<div class="crypto-section" id="crypto">
+  <div class="section-header reveal">
+    <div>
+      <h2 class="section-title">Cryptocurrency <span>Markets</span></h2>
+      <p class="section-sub">Live prices, market cap, and 7-day performance for top coins</p>
+    </div>
+    <a href="#" class="view-all">All 450+ coins →</a>
+  </div>
+
+  <div class="crypto-table reveal">
+    <div class="crypto-thead">
+      <div>#</div>
+      <div>Name</div>
+      <div>Price</div>
+      <div>24h %</div>
+      <div class="hide-mob">7d %</div>
+      <div class="hide-mob">Market Cap</div>
+      <div class="hide-mob">7d Chart</div>
+    </div>
+    <!-- rows -->
+    <div class="crypto-row-full">
+      <div class="cr-rank">1</div>
+      <div class="cr-coin"><div class="cr-icon" style="background:#f7931a;">₿</div><div><div class="cr-cname">Bitcoin</div><div class="cr-csym">BTC</div></div></div>
+      <div class="cr-price">$84,210.00</div>
+      <div class="cr-chg up">+2.34%</div>
+      <div class="cr-chg up hide-mob">+5.82%</div>
+      <div class="cr-mcap hide-mob">$1.66T</div>
+      <div class="cr-sparkline hide-mob"><svg viewBox="0 0 80 30"><polyline points="0,25 15,20 25,22 35,15 45,10 55,8 65,6 80,4" fill="none" stroke="#2e7d32" stroke-width="1.5"/></svg></div>
+    </div>
+    <div class="crypto-row-full">
+      <div class="cr-rank">2</div>
+      <div class="cr-coin"><div class="cr-icon" style="background:#627eea;">Ξ</div><div><div class="cr-cname">Ethereum</div><div class="cr-csym">ETH</div></div></div>
+      <div class="cr-price">$1,624.30</div>
+      <div class="cr-chg down">−0.81%</div>
+      <div class="cr-chg down hide-mob">−3.22%</div>
+      <div class="cr-mcap hide-mob">$196.8B</div>
+      <div class="cr-sparkline hide-mob"><svg viewBox="0 0 80 30"><polyline points="0,10 15,12 25,11 35,14 45,16 55,15 65,18 80,20" fill="none" stroke="#c62828" stroke-width="1.5"/></svg></div>
+    </div>
+    <div class="crypto-row-full">
+      <div class="cr-rank">3</div>
+      <div class="cr-coin"><div class="cr-icon" style="background:#f3ba2f;">🔸</div><div><div class="cr-cname">BNB</div><div class="cr-csym">BNB</div></div></div>
+      <div class="cr-price">$602.15</div>
+      <div class="cr-chg up">+1.15%</div>
+      <div class="cr-chg up hide-mob">+4.40%</div>
+      <div class="cr-mcap hide-mob">$87.3B</div>
+      <div class="cr-sparkline hide-mob"><svg viewBox="0 0 80 30"><polyline points="0,20 15,18 25,17 35,14 45,12 55,11 65,9 80,7" fill="none" stroke="#2e7d32" stroke-width="1.5"/></svg></div>
+    </div>
+    <div class="crypto-row-full">
+      <div class="cr-rank">4</div>
+      <div class="cr-coin"><div class="cr-icon" style="background:#9945ff;">◎</div><div><div class="cr-cname">Solana</div><div class="cr-csym">SOL</div></div></div>
+      <div class="cr-price">$128.40</div>
+      <div class="cr-chg down">−1.43%</div>
+      <div class="cr-chg down hide-mob">−2.10%</div>
+      <div class="cr-mcap hide-mob">$66.1B</div>
+      <div class="cr-sparkline hide-mob"><svg viewBox="0 0 80 30"><polyline points="0,12 15,13 25,12 35,15 45,16 55,17 65,18 80,19" fill="none" stroke="#c62828" stroke-width="1.5"/></svg></div>
+    </div>
+    <div class="crypto-row-full">
+      <div class="cr-rank">5</div>
+      <div class="cr-coin"><div class="cr-icon" style="background:#2775ca;">$</div><div><div class="cr-cname">USD Coin</div><div class="cr-csym">USDC</div></div></div>
+      <div class="cr-price">$1.0001</div>
+      <div class="cr-chg up">+0.01%</div>
+      <div class="cr-chg up hide-mob">+0.02%</div>
+      <div class="cr-mcap hide-mob">$57.4B</div>
+      <div class="cr-sparkline hide-mob"><svg viewBox="0 0 80 30"><polyline points="0,15 15,15 25,15 35,15 45,15 55,15 65,15 80,15" fill="none" stroke="#7a7a7a" stroke-width="1.5"/></svg></div>
+    </div>
+    <div class="crypto-row-full">
+      <div class="cr-rank">6</div>
+      <div class="cr-coin"><div class="cr-icon" style="background:#e84142;">A</div><div><div class="cr-cname">Avalanche</div><div class="cr-csym">AVAX</div></div></div>
+      <div class="cr-price">$21.45</div>
+      <div class="cr-chg up">+3.82%</div>
+      <div class="cr-chg up hide-mob">+8.14%</div>
+      <div class="cr-mcap hide-mob">$8.9B</div>
+      <div class="cr-sparkline hide-mob"><svg viewBox="0 0 80 30"><polyline points="0,22 15,19 25,18 35,14 45,11 55,9 65,7 80,5" fill="none" stroke="#2e7d32" stroke-width="1.5"/></svg></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CALCULATORS ══════════════════════════════════════════ -->
+<section class="calc-section" id="calculators">
+  <div class="calc-inner">
+    <div class="section-header reveal">
+      <div>
+        <h2 class="section-title" style="color:var(--blue-deep)">Financial <span>Calculators</span></h2>
+        <p class="section-sub">Powerful tools to plan, analyze, and optimize your finances</p>
+      </div>
+      <a href="#" class="view-all">All 30 calculators →</a>
+    </div>
+    <div class="calc-grid reveal">
+
+      <div class="calc-card">
+        <div class="calc-icon" style="background:var(--blue-pale);">📊</div>
+        <div class="calc-name">Loan Amortization</div>
+        <div class="calc-desc">Calculate monthly payments, interest schedules, and full amortization tables for any loan.</div>
+        <div class="calc-arrow">→</div>
+      </div>
+
+      <div class="calc-card">
+        <div class="calc-icon" style="background:var(--gold-pale);">📈</div>
+        <div class="calc-name">Compound Interest</div>
+        <div class="calc-desc">Visualize how your investments grow over time with different compounding frequencies.</div>
+        <div class="calc-arrow">→</div>
+      </div>
+
+      <div class="calc-card">
+        <div class="calc-icon" style="background:var(--green-pale);">💰</div>
+        <div class="calc-name">NPV &amp; IRR</div>
+        <div class="calc-desc">Net Present Value and Internal Rate of Return for project and investment evaluation.</div>
+        <div class="calc-arrow">→</div>
+      </div>
+
+      <div class="calc-card">
+        <div class="calc-icon" style="background:#fce4ec;">🏦</div>
+        <div class="calc-name">Mortgage Calculator</div>
+        <div class="calc-desc">Full mortgage breakdown with principal, interest, tax, and insurance (PITI) schedules.</div>
+        <div class="calc-arrow">→</div>
+      </div>
+
+      <div class="calc-card">
+        <div class="calc-icon" style="background:var(--blue-pale);">📉</div>
+        <div class="calc-name">DCF Valuation</div>
+        <div class="calc-desc">Discounted Cash Flow model to estimate the intrinsic value of any asset or business.</div>
+        <div class="calc-arrow">→</div>
+      </div>
+
+      <div class="calc-card">
+        <div class="calc-icon" style="background:var(--gold-pale);">💱</div>
+        <div class="calc-name">Currency Converter</div>
+        <div class="calc-desc">Real-time conversion across 150+ currencies with historical rate charts.</div>
+        <div class="calc-arrow">→</div>
+      </div>
+
+      <div class="calc-card">
+        <div class="calc-icon" style="background:var(--green-pale);">🎯</div>
+        <div class="calc-name">Retirement Planner</div>
+        <div class="calc-desc">Project your retirement savings and determine how much you need to save each month.</div>
+        <div class="calc-arrow">→</div>
+      </div>
+
+      <div class="calc-card">
+        <div class="calc-icon" style="background:#f3e5f5;">⚖️</div>
+        <div class="calc-name">Break-Even Analysis</div>
+        <div class="calc-desc">Find the point where total revenue equals total costs for any business or product.</div>
+        <div class="calc-arrow">→</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ BLOG ══════════════════════════════════════════════════ -->
+<section class="blog-section" id="blog">
+  <div class="blog-inner">
+    <div class="section-header reveal">
+      <div>
+        <h2 class="section-title">Latest <span>Analysis</span> &amp; Blog</h2>
+        <p class="section-sub">Expert insights on markets, economies, and financial trends</p>
+      </div>
+      <a href="#" class="view-all">All articles →</a>
+    </div>
+    <div class="blog-grid reveal">
+
+      <!-- Featured -->
+      <div class="blog-card">
+        <div class="blog-thumb featured">
+          <div class="blog-thumb-bg" style="background:linear-gradient(135deg,#0a2744,#1565c0);">
+            <span style="font-size:3rem;">📈</span>
+            <div style="position:absolute;bottom:12px;left:16px;font-size:.7rem;font-family:'DM Mono',monospace;color:rgba(255,255,255,.5)">FEATURED ANALYSIS</div>
+          </div>
+        </div>
+        <div class="blog-body">
+          <span class="blog-tag" style="background:var(--blue-pale);color:var(--blue-mid)">Markets</span>
+          <div class="blog-title">Why the S&amp;P 500 Has Outpaced All Global Indices for 15 Years</div>
+          <div class="blog-excerpt">A deep dive into US market dominance, dollar liquidity cycles, and what historical data tells us about the next decade of equity returns.</div>
+          <div class="blog-meta"><span>Joseph Wanyoike</span><div class="dot"></div><span>Apr 16, 2026</span><div class="dot"></div><span>8 min read</span></div>
+        </div>
+      </div>
+
+      <!-- Regular -->
+      <div class="blog-card">
+        <div class="blog-thumb">
+          <div class="blog-thumb-bg" style="background:linear-gradient(135deg,#1b5e20,#2d6a4f);">
+            <span style="font-size:2.5rem;">💸</span>
+          </div>
+        </div>
+        <div class="blog-body">
+          <span class="blog-tag" style="background:var(--green-pale);color:var(--green-mid)">World Data</span>
+          <div class="blog-title">Global Debt Crisis: Which Countries Are Most Exposed?</div>
+          <div class="blog-excerpt">IMF data reveals alarming debt-to-GDP ratios across emerging markets as interest rates remain elevated globally.</div>
+          <div class="blog-meta"><span>Apr 14, 2026</span><div class="dot"></div><span>6 min read</span></div>
+        </div>
+      </div>
+
+      <div class="blog-card">
+        <div class="blog-thumb">
+          <div class="blog-thumb-bg" style="background:linear-gradient(135deg,#3e2723,#795548);">
+            <span style="font-size:2.5rem;">₿</span>
+          </div>
+        </div>
+        <div class="blog-body">
+          <span class="blog-tag" style="background:var(--gold-pale);color:#8a6300">Crypto</span>
+          <div class="blog-title">Bitcoin's 4-Year Cycle: Are We in a Bull Run or a Trap?</div>
+          <div class="blog-excerpt">On-chain metrics, halving history, and institutional flows paint a complex picture for crypto in 2026.</div>
+          <div class="blog-meta"><span>Apr 12, 2026</span><div class="dot"></div><span>5 min read</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ BROWSE TOPICS ════════════════════════════════════════ -->
+<section class="topics-section">
+  <div class="topics-inner">
+    <h2 class="topics-head reveal">Explore All Topics</h2>
+    <div class="topics-grid reveal">
+
+      <div class="topic-brand">
+        <div class="brand-icon">💹</div>
+        <div class="brand-name">WFD Project</div>
+        <p class="brand-tagline">Our mission is to make global financial data transparent and accessible — empowering everyone with the intelligence to make informed financial decisions.</p>
+        <div style="margin-top:14px;font-size:.78rem;color:rgba(183,228,199,.5);">Part of the <a href="#" style="color:var(--green-light);text-decoration:underline;">World Data Analysis</a> ecosystem</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;">
+        <div>
+          <div class="topic-col-head"><span>📊</span> Markets &amp; Finance</div>
+          <div class="topic-link-item">S&amp;P 500 Analysis<span class="tli-arrow">→</span></div>
+          <div class="topic-link-item">Global Indices<span class="tli-arrow">→</span></div>
+          <div class="topic-link-item">Crypto Markets<span class="tli-arrow">→</span></div>
+          <div class="topic-link-item">Forex Rates<span class="tli-arrow">→</span></div>
+          <div class="topic-link-item">Commodities<span class="tli-arrow">→</span></div>
+          <div class="topic-link-item">Bond Markets<span class="tli-arrow">→</span></div>
+        </div>
+        <div>
+          <div class="topic-col-head"><span>🌍</span> World Economic Data</div>
+          <div class="topic-link-item">GDP by Country<span class="tli-arrow">→</span></div>
+          <div class="topic-link-item">Inflation Tracker<span class="tli-arrow">→</span></div>
+          <div class="topic-link-item">Government Debt<span class="tli-arrow">→</span></div>
+          <div class="topic-link-item">Richest Countries<span class="tli-arrow">→</span></div>
+          <div class="topic-link-item">Trade Balances<span class="tli-arrow">→</span></div>
+          <div class="topic-link-item">Interest Rates<span class="tli-arrow">→</span></div>
+        </div>
+      </div>
+
+      <div class="topic-brand">
+        <div class="brand-icon" style="background:linear-gradient(135deg,var(--gold),#f0c040);">🧮</div>
+        <div class="brand-name">Data Sources</div>
+        <p class="brand-tagline">Powered by World Bank, IMF, Federal Reserve, ECB, BIS, and Bloomberg-grade financial data APIs.</p>
+        <div style="margin-top:14px;">
+          <div class="topic-link-item">IMF Data Portal<span class="tli-arrow">→</span></div>
+          <div class="topic-link-item">World Bank Open Data<span class="tli-arrow">→</span></div>
+          <div class="topic-link-item">FRED (St. Louis Fed)<span class="tli-arrow">→</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ NEWSLETTER ════════════════════════════════════════════ -->
+<div class="newsletter-strip">
+  <div class="nl-inner">
+    <div class="nl-text">
+      <div class="nl-title">📬 Market Intelligence, Daily</div>
+      <div class="nl-sub">Get top financial stories, charts, and data insights delivered every morning.</div>
+    </div>
+    <div class="nl-form">
+      <input class="nl-input" type="email" placeholder="Your email address…">
+      <button class="nl-btn">Subscribe Free</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FOOTER ════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="#" class="footer-logo">
+          <div class="footer-logo-icon">💹</div>
+          World Finance Dashboard
+        </a>
+        <p>Making global financial data transparent and accessible — one chart at a time. Part of the WDA ecosystem.</p>
+        <div class="social-row">
+          <a href="#" class="social-btn" title="Facebook">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+          </a>
+          <a href="#" class="social-btn" title="X / Twitter">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          <a href="#" class="social-btn" title="LinkedIn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+          </a>
+          <a href="#" class="social-btn" title="WhatsApp">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Markets</h4>
+        <ul>
+          <li><a href="#">Global Indices</a></li>
+          <li><a href="#">US Stocks</a></li>
+          <li><a href="#">Crypto</a></li>
+          <li><a href="#">Forex Rates</a></li>
+          <li><a href="#">Commodities</a></li>
+          <li><a href="#">Bond Markets</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Economic Data</h4>
+        <ul>
+          <li><a href="#">GDP Tracker</a></li>
+          <li><a href="#">Inflation Data</a></li>
+          <li><a href="#">Government Debt</a></li>
+          <li><a href="#">Richest Countries</a></li>
+          <li><a href="#">Interest Rates</a></li>
+          <li><a href="#">Trade Balance</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Calculators</h4>
+        <ul>
+          <li><a href="#">Loan Amortization</a></li>
+          <li><a href="#">Compound Interest</a></li>
+          <li><a href="#">NPV &amp; IRR</a></li>
+          <li><a href="#">Mortgage Calc</a></li>
+          <li><a href="#">DCF Valuation</a></li>
+          <li><a href="#">Retirement Planner</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About WFD</a></li>
+          <li><a href="#">Data Sources</a></li>
+          <li><a href="#">WDA Project</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Careers</a></li>
+        </ul>
+      </div>
+    </div>
+    <hr class="footer-divider">
+    <div class="footer-disclaimer">
+      ⚠️ <strong>Disclaimer:</strong> World Finance Dashboard is for informational and educational purposes only. Nothing on this site constitutes financial, investment, or legal advice. Always conduct your own research and consult a qualified financial professional before making investment decisions. Market data may be delayed.
+    </div>
+    <hr class="footer-divider">
+    <div class="footer-bottom">
+      <span>© 2026 World Finance Dashboard · worldfinancedashboard.com · All rights reserved.</span>
+      <div class="footer-bottom-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Use</a>
+        <a href="#">Data Sources</a>
+        <a href="#">Disclaimer</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ── Mobile menu toggle
+  function toggleMenu() {
+    const menu = document.getElementById('mobileMenu');
+    menu.classList.toggle('open');
+  }
+
+  // ── Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        e.target.style.transitionDelay = (i * 0.07) + 's';
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ── Bar fills on load
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.querySelectorAll('.bar-fill, .hbar-fill').forEach(bar => {
+        if (bar.dataset.w) {
+          bar.style.width = bar.dataset.w + '%';
+        }
+      });
+    }, 500);
+  });
+
+  // ── Counter animation
+  function animateCounter(el, target, suffix = '') {
+    let start = 0;
+    const duration = 1800;
+    const step = (timestamp) => {
+      if (!start) start = timestamp;
+      const progress = Math.min((timestamp - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.floor(eased * target) + suffix;
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  const statsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        animateCounter(document.getElementById('cnt-markets'), 180, '+');
+        animateCounter(document.getElementById('cnt-crypto'), 450, '+');
+        animateCounter(document.getElementById('cnt-calc'), 30, '+');
+        animateCounter(document.getElementById('cnt-countries'), 195, '');
+        statsObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.5 });
+  const statsBar = document.querySelector('.stats-bar');
+  if (statsBar) statsObserver.observe(statsBar);
+
+  // ── Category bar active
+  document.querySelectorAll('.cat-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+    });
+  });
+
+  // ── Simulate live ticker value drift (tiny random tweaks)
+  function nudgeTickerValues() {
+    document.querySelectorAll('.tick-val').forEach((el, i) => {
+      // Very subtle flicker effect
+      if (Math.random() < 0.12) {
+        el.style.opacity = '.6';
+        setTimeout(() => el.style.opacity = '1', 200);
+      }
+    });
+  }
+  setInterval(nudgeTickerValues, 3000);
+
+  // ── Search focus scale
+  const searchInput = document.querySelector('.search-wrap input');
+  if (searchInput) {
+    searchInput.addEventListener('focus', () => { searchInput.parentElement.style.transform = 'scale(1.01)'; });
+    searchInput.addEventListener('blur',  () => { searchInput.parentElement.style.transform = 'scale(1)'; });
+  }
+
+  // ── Animate heatmap cells on reveal
+  const heatObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.querySelectorAll('.heat-cell').forEach((cell, i) => {
+          cell.style.opacity = '0';
+          cell.style.transform = 'scale(0.8)';
+          cell.style.transition = `all .3s ease ${i * 0.03}s`;
+          setTimeout(() => { cell.style.opacity = '1'; cell.style.transform = 'scale(1)'; }, 50);
+        });
+        heatObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.2 });
+  document.querySelectorAll('.heatmap-bg').forEach(el => heatObserver.observe(el));
+</script>
+
+</body>
+</html>
