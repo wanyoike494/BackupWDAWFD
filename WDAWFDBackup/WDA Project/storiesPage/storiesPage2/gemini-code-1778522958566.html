@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>World Demographics Analysis — WDA Project</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ─── INHERITED CSS VARIABLES ───────────────────────── */
+    :root {
+      --green-deep:   #1a3c2e;
+      --green-mid:    #2d6a4f;
+      --green-light:  #52b788;
+      --green-pale:   #b7e4c7;
+      --blue-deep:    #0a2744;
+      --blue-mid:     #1565c0;
+      --blue-sky:     #4a9fd4;
+      --blue-pale:    #bbdefb;
+      --brown-deep:   #3e2723;
+      --brown-mid:    #795548;
+      --brown-light:  #a1887f;
+      --brown-pale:   #d7ccc8;
+      --cream:        #f9f6f0;
+      --warm-white:   #fefcf8;
+      --text-dark:    #1a1a1a;
+      --text-mid:     #4a4a4a;
+      --text-light:   #7a7a7a;
+      --border:       #e8e2d8;
+      --shadow-sm: 0 2px 12px rgba(26,60,46,0.08);
+      --shadow-md: 0 8px 32px rgba(26,60,46,0.12);
+      --shadow-lg: 0 20px 60px rgba(26,60,46,0.16);
+    }
+
+    /* ─── RESET & BASE ──────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--text-dark);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+    
+    /* Grain Overlay */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      opacity: 0.04; pointer-events: none; z-index: 9999;
+    }
+
+    /* ─── NAVIGATION (Inherited) ───────────────────────── */
+    nav {
+      background: var(--green-deep);
+      color: #fff;
+      padding: 1rem 2rem;
+      position: sticky; top: 0; z-index: 1000;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .nav-inner {
+      max-width: 1400px; margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 900; display: flex; align-items: center; gap: 0.5rem; }
+    .nav-links { list-style: none; display: flex; gap: 2rem; align-items: center; }
+    .nav-links a { font-size: 0.9rem; font-weight: 500; opacity: 0.9; transition: 0.3s; }
+    .nav-links a:hover { opacity: 1; color: var(--green-light); }
+
+    /* ─── TOPIC HERO ────────────────────────────────────── */
+    .hero-topic {
+      padding: 4rem 2rem 2rem;
+      max-width: 1200px; margin: 0 auto;
+      text-align: center;
+    }
+    .hero-topic h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      color: var(--green-deep);
+      margin-bottom: 1rem;
+    }
+    .hero-topic p {
+      font-size: 1.2rem;
+      color: var(--text-mid);
+      max-width: 700px; margin: 0 auto 3rem;
+    }
+
+    /* MAP PLACEHOLDER */
+    .map-container {
+      width: 100%;
+      aspect-ratio: 21/9;
+      background: var(--green-deep);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--green-pale);
+      border: 8px solid #fff;
+    }
+    .map-placeholder-img {
+      position: absolute; width: 100%; height: 100%;
+      object-fit: cover; opacity: 0.4;
+      filter: grayscale(0.5) contrast(1.2);
+    }
+    .map-overlay {
+      position: relative; z-index: 2; text-align: center;
+    }
+    .map-overlay h2 { font-family: 'DM Mono', monospace; font-size: 1rem; letter-spacing: 2px; text-transform: uppercase; }
+
+    /* ─── ARTICLE LAYOUT ────────────────────────────────── */
+    .article-wrap {
+      max-width: 1200px; margin: 4rem auto;
+      display: grid;
+      grid-template-columns: 250px 1fr 280px;
+      gap: 3rem;
+      padding: 0 2rem;
+    }
+
+    /* Left Sidebar: Topic Navigation */
+    .topic-nav {
+      position: sticky; top: 100px; height: fit-content;
+    }
+    .topic-nav h4 { font-size: 0.8rem; text-transform: uppercase; color: var(--text-light); margin-bottom: 1.5rem; letter-spacing: 1px; }
+    .topic-nav ul { list-style: none; }
+    .topic-nav li { margin-bottom: 1rem; }
+    .topic-nav a { 
+      font-weight: 500; color: var(--text-mid); 
+      display: flex; align-items: center; gap: 0.5rem; transition: 0.3s;
+    }
+    .topic-nav a::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--border); transition: 0.3s; }
+    .topic-nav a:hover, .topic-nav a.active { color: var(--green-mid); }
+    .topic-nav a:hover::before, .topic-nav a.active::before { background: var(--green-mid); transform: scale(1.5); }
+
+    /* Main Story Content */
+    .story-content {
+      font-size: 1.15rem;
+      color: var(--text-dark);
+    }
+    .story-content p { margin-bottom: 2rem; }
+    .story-content h2 { 
+      font-family: 'Playfair Display', serif; font-size: 2.2rem; 
+      margin: 3rem 0 1.5rem; color: var(--green-deep); 
+    }
+
+    /* Inline Visuals */
+    .data-viz-box {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      margin: 3rem 0;
+      box-shadow: var(--shadow-sm);
+    }
+    .viz-header { margin-bottom: 1.5rem; border-left: 4px solid var(--blue-mid); padding-left: 1rem; }
+    .viz-header h3 { font-size: 1.1rem; color: var(--blue-deep); }
+    .viz-placeholder {
+      width: 100%; height: 300px;
+      background: var(--warm-white);
+      border: 1px dashed var(--border);
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 8px;
+      color: var(--text-light); font-family: 'DM Mono', monospace; font-size: 0.9rem;
+    }
+
+    /* Right Sidebar: Recommendations */
+    .recommendations { position: sticky; top: 100px; height: fit-content; }
+    .recommendations h4 { font-size: 0.8rem; text-transform: uppercase; color: var(--text-light); margin-bottom: 1.5rem; }
+    .rec-card {
+      background: #fff; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem;
+      border: 1px solid var(--border); transition: 0.3s;
+    }
+    .rec-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--green-pale); }
+    .rec-tag { font-size: 0.7rem; font-weight: 700; color: var(--green-mid); text-transform: uppercase; margin-bottom: 0.5rem; display: block; }
+    .rec-card h5 { font-size: 0.95rem; line-height: 1.4; color: var(--text-dark); }
+
+    /* ─── CONTRIBUTOR SECTION ─────────────────────────── */
+    .contributor-section {
+      background: var(--green-deep);
+      color: #fff;
+      padding: 5rem 2rem;
+      margin-top: 6rem;
+    }
+    .contributor-inner {
+      max-width: 800px; margin: 0 auto;
+      display: flex; gap: 3rem; align-items: center;
+    }
+    .contributor-img {
+      width: 180px; height: 180px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid var(--green-light);
+      flex-shrink: 0;
+    }
+    .contributor-bio h3 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 0.5rem; }
+    .contributor-bio .role { color: var(--green-pale); font-family: 'DM Mono', monospace; font-size: 0.9rem; margin-bottom: 1rem; display: block; }
+    .contributor-bio p { opacity: 0.8; font-size: 1rem; margin-bottom: 1.5rem; }
+    .btn-contribute {
+      display: inline-block; padding: 0.8rem 1.5rem;
+      background: var(--green-light); color: var(--green-deep);
+      font-weight: 700; border-radius: 30px; font-size: 0.9rem;
+    }
+
+    /* ─── FOOTER (Inherited) ──────────────────────────── */
+    footer { background: var(--blue-deep); color: #fff; padding: 4rem 2rem; }
+    .footer-inner { max-width: 1200px; margin: 0 auto; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 3rem; }
+    .footer-col h4 { margin-bottom: 1.5rem; color: var(--blue-sky); }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 0.8rem; opacity: 0.7; font-size: 0.9rem; }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem; font-size: 0.85rem; opacity: 0.6; display: flex; justify-content: space-between; }
+
+    /* ─── RESPONSIVE ────────────────────────────────────── */
+    @media (max-width: 1100px) {
+      .article-wrap { grid-template-columns: 200px 1fr; }
+      .recommendations { display: none; }
+    }
+    @media (max-width: 768px) {
+      .article-wrap { grid-template-columns: 1fr; }
+      .topic-nav { position: relative; top: 0; margin-bottom: 2rem; }
+      .topic-nav ul { display: flex; overflow-x: auto; gap: 1.5rem; padding-bottom: 1rem; }
+      .topic-nav li { margin-bottom: 0; white-space: nowrap; }
+      .hero-topic h1 { font-size: 2.5rem; }
+      .contributor-inner { flex-direction: column; text-align: center; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <a href="wdaIndex.html" class="logo">🌍 WDA Project</a>
+      <ul class="nav-links">
+        <li><a href="wda-topics.html">Browse Topics</a></li>
+        <li><a href="#">Articles</a></li>
+        <li><a href="#" style="background: var(--green-light); color: var(--green-deep); padding: 0.5rem 1rem; border-radius: 4px; font-weight: bold;">Log in</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="hero-topic">
+    <h1>World Demographics Analysis</h1>
+    <p>Understanding the pulse of humanity through birth rates, migration patterns, and the global aging phenomenon.</p>
+    
+    <div class="map-container">
+      <img src="https://images.unsplash.com/photo-1521295121783-8a321d551ad2?auto=format&fit=crop&q=80&w=2000" alt="World Map" class="map-placeholder-img">
+      <div class="map-overlay">
+        <h2>Interactive Global Population Density</h2>
+        <p style="color: var(--green-pale); font-size: 0.9rem; margin-top: 0.5rem;">(D3.js Visualization Coming Soon)</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="article-wrap">
+    
+    <aside class="topic-nav">
+      <h4>In this topic</h4>
+      <ul>
+        <li><a href="#" class="active">Overview</a></li>
+        <li><a href="#">Fertility Rates</a></li>
+        <li><a href="#">The Graying World</a></li>
+        <li><a href="#">Migration Flows</a></li>
+        <li><a href="#">Urbanization 2050</a></li>
+        <li><a href="#">Gender Ratios</a></li>
+      </ul>
+    </aside>
+
+    <main class="story-content">
+      <p>As we cross the threshold of 8 billion people, the story of global demographics is no longer just about growth—it is about a radical divergence. While some nations are bracing for a population explosion, others are managing an unprecedented contraction.</p>
+
+      <h2>The Great Population Divergence</h2>
+      <p>By 2050, over half of the world’s projected population growth will be concentrated in just eight countries. This shift represents a fundamental change in the global economic and political landscape.</p>
+
+      <div class="data-viz-box">
+        <div class="viz-header">
+          <h3>Figure 1: Global Population Growth Projections (2024–2100)</h3>
+        </div>
+        <div class="viz-placeholder">
+          [Line Chart: Multi-regional growth curves]
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-light); margin-top: 1rem; margin-bottom: 0;">Source: UN World Population Prospects. Interactive features will allow filtering by region.</p>
+      </div>
+
+      <p>While sub-Saharan Africa continues to see robust growth, East Asia and Europe are entering a "super-aged" phase. Japan, Italy, and South Korea are at the forefront of this transition, facing challenges that will soon become global norms.</p>
+
+      <h2>Urbanization: The Century of the City</h2>
+      <p>In 1950, only 30% of the world lived in urban areas. Today, that number is 56%, and it is expected to reach nearly 70% by 2050. The story of demographics is increasingly a story of the city.</p>
+
+      <div class="data-viz-box">
+        <div class="viz-header">
+          <h3>Figure 2: Urban vs. Rural Population Distribution</h3>
+        </div>
+        <div class="viz-placeholder">
+          [Stacked Bar Chart: Regional Urbanization Rates]
+        </div>
+      </div>
+    </main>
+
+    <aside class="recommendations">
+      <h4>Recommended Analysis</h4>
+      <a href="#" class="rec-card">
+        <span class="rec-tag">Economics</span>
+        <h5>The Cost of an Aging Workforce in Europe</h5>
+      </a>
+      <a href="#" class="rec-card">
+        <span class="rec-tag">Politics</span>
+        <h5>Migration Policies: A Comparative Study</h5>
+      </a>
+      <a href="#" class="rec-card">
+        <span class="rec-tag">Health</span>
+        <h5>Life Expectancy Trends Post-2020</h5>
+      </a>
+    </aside>
+
+  </div>
+
+  <section class="contributor-section">
+    <div class="contributor-inner">
+      <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400" alt="Contributor" class="contributor-img">
+      <div class="contributor-bio">
+        <span class="role">Lead Data Analyst</span>
+        <h3>Joseph Wanyoike Njoroge</h3>
+        <p>A dedicated security professional and data enthusiast currently based in Qatar. Joseph explores the intersection of global security data and human demographics to tell stories that matter.</p>
+        <div style="display: flex; gap: 1rem;">
+          <a href="#" class="btn-contribute">View All Works</a>
+          <a href="#" style="border: 1px solid var(--green-pale); color: #fff; padding: 0.8rem 1.5rem; border-radius: 30px; font-size: 0.9rem;">Contributor Guidelines</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="logo" style="color:var(--blue-sky); margin-bottom: 1rem;">🌍 WDA Project</div>
+          <p style="opacity: 0.7; font-size: 0.9rem;">Empowering global citizens through transparent data storytelling. Join our community of analysts.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Topics</h4>
+          <ul>
+            <li>Demographics</li>
+            <li>Economics</li>
+            <li>Environment</li>
+            <li>Politics</li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li>Data Sources</li>
+            <li>Methodology</li>
+            <li>API Access</li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Organization</h4>
+          <ul>
+            <li>About Us</li>
+            <li>Contributors</li>
+            <li>Contact</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 WDA Project. Built for transparency.</p>
+        <div style="display:flex; gap: 1.5rem;">
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Intersection Observer for revealing elements on scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.data-viz-box, .story-content h2, .rec-card').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      el.style.transition = 'all 0.6s ease-out';
+      observer.observe(el);
+    });
+
+    // Mobile Navigation logic could be added here
+  </script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>World Demographics Analysis | WDA Project</title>
+  <link rel="stylesheet" href="storiesStyles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- HEADER (Inherited) -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">🌍 <span>WDA Project</span></a>
+      <nav class="main-nav" aria-label="Main Navigation">
+        <button class="mobile-toggle" aria-expanded="false" aria-controls="nav-menu">☰</button>
+        <ul id="nav-menu" class="nav-list">
+          <li><a href="index.html">Enters with analysis</a></li>
+          <li><a href="wda-topics.html">WDA Analysis Articles</a></li>
+          <li><a href="#" class="btn-outline">Log in</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- BREADCRUMB + HERO -->
+    <section class="page-hero">
+      <div class="container">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="index.html">Home</a> › <a href="wda-topics.html">Browse Topics</a> › <span>Demographics</span>
+        </nav>
+        <div class="hero-content">
+          <h1>World Demographics Analysis</h1>
+          <p class="hero-subtitle">Population, migration & age structure trends shaping our global future.</p>
+        </div>
+        <!-- D3.js Choropleth Map Placeholder -->
+        <div class="hero-map-wrapper">
+          <div id="choropleth-map-placeholder" class="chart-placeholder map-placeholder">
+            <div class="chart-grid"></div>
+            <div class="chart-label">🌍 World Population Density Choropleth Map</div>
+            <div class="chart-sublabel">Placeholder for D3.js TopoJSON + Color Scale Integration</div>
+            <button class="chart-action-btn">Load Real Map →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUICK STATS BAR -->
+    <section class="stats-bar">
+      <div class="container stats-grid">
+        <div class="stat-item"><span class="stat-value">8.1B</span><span class="stat-label">Global Population</span></div>
+        <div class="stat-item"><span class="stat-value">2.3</span><span class="stat-label">Avg Fertility Rate</span></div>
+        <div class="stat-item"><span class="stat-value">+1.1%</span><span class="stat-label">Annual Growth</span></div>
+        <div class="stat-item"><span class="stat-value">57%</span><span class="stat-label">Urban Residents</span></div>
+      </div>
+    </section>
+
+    <!-- MAIN LAYOUT: ARTICLE + SIDEBAR -->
+    <div class="container topic-layout">
+      <article class="analysis-content">
+        <h2 id="overview">Overview: The Shifting Global Demographic Landscape</h2>
+        <p>The world’s demographic profile is undergoing its most rapid transformation in human history. While some regions experience aging populations and shrinking workforces, others are navigating unprecedented youth bulges and urban migration. This analysis synthesizes UN, World Bank, and WHO datasets to reveal the underlying currents driving population distribution, life expectancy, and migration flows.</p>
+
+        <div class="insight-callout">
+          <strong>🔍 Key Insight:</strong> By 2050, more than half of global population growth will be concentrated in just eight countries, primarily in Africa and Asia.
+        </div>
+
+        <h2 id="trends">Key Trends & Historical Context</h2>
+        <p>Since the mid-20th century, global population has tripled, but the rate of growth has steadily decelerated. The transition from high fertility/high mortality to low fertility/low mortality models varies dramatically by region.</p>
+
+        <!-- D3.js Line Chart Placeholder -->
+        <figure class="data-visualization">
+          <div id="line-chart-pop-growth" class="chart-placeholder">
+            <div class="chart-grid"></div>
+            <div class="chart-label">📈 Global Population Growth (1950–2050)</div>
+            <div class="chart-sublabel">D3.js Line Chart Placeholder: Time Series + Projection Band</div>
+          </div>
+          <figcaption>Figure 1: Projected growth deceleration post-2030. Source: UN World Population Prospects.</figcaption>
+        </figure>
+
+        <h2 id="regional">Regional Spotlight</h2>
+        <p>Africa's demographic trajectory stands in stark contrast to Europe and East Asia. While sub-Saharan Africa's median age remains under 19, countries like Japan and Italy are navigating super-aged societies where over 28% of citizens are 65+.</p>
+
+        <!-- D3.js Bar/Stacked Chart Placeholder -->
+        <figure class="data-visualization">
+          <div id="bar-chart-age-regions" class="chart-placeholder">
+            <div class="chart-grid"></div>
+            <div class="chart-label">📊 Median Age by Region (2024)</div>
+            <div class="chart-sublabel">D3.js Horizontal Bar Chart Placeholder: Categorical Comparison</div>
+          </div>
+          <figcaption>Figure 2: Regional divergence in population aging. Data: World Bank, UN DESA.</figcaption>
+        </figure>
+
+        <h2 id="migration">Migration & Displacement Dynamics</h2>
+        <p>Climate stress, economic disparity, and geopolitical conflict continue to reshape human mobility. International migrant stock has surpassed 280 million, with remittance flows now exceeding official development assistance in many low-income economies.</p>
+
+        <!-- D3.js Scatter/Flow Chart Placeholder -->
+        <figure class="data-visualization">
+          <div id="scatter-migration-flows" class="chart-placeholder">
+            <div class="chart-grid"></div>
+            <div class="chart-label">🌐 Migration Flow Density (2015–2024)</div>
+            <div class="chart-sublabel">D3.js Sankey/Flow Diagram Placeholder: Corridor Visualization</div>
+          </div>
+          <figcaption>Figure 3: Major migration corridors and volume shifts post-2020.</figcaption>
+        </figure>
+
+        <h2 id="methodology">Data Sources & Methodology</h2>
+        <p>All visualizations and statistical claims in this analysis are derived from publicly available, peer-reviewed datasets including:</p>
+        <ul class="source-list">
+          <li>🇺🇳 UN Department of Economic and Social Affairs (World Population Prospects 2024)</li>
+          <li>🏦 World Bank Open Data (Population, Migration, Urbanization Indicators)</li>
+          <li>🏥 WHO Global Health Observatory (Life Expectancy, Fertility, Mortality)</li>
+        </ul>
+        <p class="meta-note">Last updated: May 2026 • Data cutoff: Q1 2026</p>
+      </article>
+
+      <!-- SIDEBAR: TOC + RECOMMENDATIONS -->
+      <aside class="sidebar">
+        <div class="sidebar-sticky">
+          <nav class="toc" aria-label="Table of Contents">
+            <h3>In This Analysis</h3>
+            <ul>
+              <li><a href="#overview" class="toc-link active">Overview</a></li>
+              <li><a href="#trends" class="toc-link">Key Trends & History</a></li>
+              <li><a href="#regional" class="toc-link">Regional Spotlight</a></li>
+              <li><a href="#migration" class="toc-link">Migration Dynamics</a></li>
+              <li><a href="#methodology" class="toc-link">Sources & Methodology</a></li>
+            </ul>
+          </nav>
+
+          <div class="sidebar-section recommendations">
+            <h3>📖 Related Analyses</h3>
+            <div class="rec-card">
+              <span class="rec-tag">Demographics</span>
+              <a href="#">African Urbanisation Rate Overtakes Asia</a>
+              <p class="rec-meta">12 min read • Updated 2025</p>
+            </div>
+            <div class="rec-card">
+              <span class="rec-tag">Economics</span>
+              <a href="#">GDP vs PPP-Adjusted Wealth Distribution</a>
+              <p class="rec-meta">8 min read • Updated 2025</p>
+            </div>
+            <div class="rec-card">
+              <span class="rec-tag">Climate</span>
+              <a href="#">Climate Migration Hotspots: 2020–2040 Projections</a>
+              <p class="rec-meta">15 min read • Updated 2024</p>
+            </div>
+          </div>
+
+          <div class="sidebar-section subtopics">
+            <h3>🗂️ Subtopic Navigation</h3>
+            <ul class="subtopic-list">
+              <li><a href="#">World Population Analysis</a></li>
+              <li><a href="#">Age Distribution & Dependency</a></li>
+              <li><a href="#">Migration & Displacement</a></li>
+              <li><a href="#">Urban vs Rural Distribution</a></li>
+              <li><a href="#">Fertility & Life Expectancy</a></li>
+            </ul>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- CONTRIBUTOR / AUTHOR SECTION -->
+    <section class="author-section">
+      <div class="container">
+        <div class="author-card">
+          <div class="author-avatar">
+            <!-- Replace with actual contributor photo -->
+            <svg viewBox="0 0 100 100" width="100%" height="100%" aria-hidden="true">
+              <circle cx="50" cy="40" r="25" fill="#cbd5e0"/>
+              <path d="M20 80 Q50 50 80 80" fill="#cbd5e0"/>
+            </svg>
+          </div>
+          <div class="author-info">
+            <h3>Dr. Elena Rostova</h3>
+            <p class="author-role">Lead Demographic Analyst & Data Journalist</p>
+            <p class="author-bio">Specializes in population modeling, migration economics, and UN demographic projections. 10+ years translating complex census data into accessible narratives. Open to collaborative research and guest contributions.</p>
+            <div class="author-meta">
+              <span>📍 Geneva, Switzerland</span>
+              <span>📊 42 Analyses Published</span>
+              <a href="#" class="author-link">View Portfolio →</a>
+            </div>
+          </div>
+        </div>
+        <div class="contributor-cta">
+          <p>📢 <strong>Want to contribute your analysis?</strong> Review our <a href="#">Contributor Guidelines & Constitution</a> or <a href="#">Submit a Proposal</a>.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER (Inherited) -->
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <h4>🌍 WDA Project</h4>
+        <p>Making world data transparent and accessible — one chart at a time.</p>
+      </div>
+      <div class="footer-links">
+        <h5>Solutions</h5>
+        <ul><li><a href="#">Data Explorer</a></li><li><a href="#">Chart Builder</a></li><li><a href="#">Country Profiles</a></li><li><a href="#">Comparisons</a></li></ul>
+      </div>
+      <div class="footer-links">
+        <h5>Topics</h5>
+        <ul><li><a href="#">World Politics</a></li><li><a href="#">Climate Change</a></li><li><a href="#">Economics</a></li><li><a href="#">Health</a></li><li><a href="#">Demographics</a></li></ul>
+      </div>
+      <div class="footer-links">
+        <h5>About</h5>
+        <ul><li><a href="#">Our Mission</a></li><li><a href="#">Data Sources</a></li><li><a href="#">Team</a></li><li><a href="#">Blog</a></li><li><a href="#">Contact</a></li></ul>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <p>© 2026 World Data Analysis Project. All rights reserved.</p>
+      <div class="footer-legal">
+        <a href="#">Solidions</a> • <a href="#">About</a> • <a href="#">Data Sources</a> • <a href="#">Privacy</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="storiesScript.js"></script>
+</body>
+</html>
